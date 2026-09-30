@@ -1,25 +1,8 @@
-/* =====================================================================
-   SCRIPT DML - Poblado inicial de la base tienda_ropa
-   ---------------------------------------------------------------------
-   - Correr DESPUÉS del script DDL (ecommerce.sql), sobre la base
-     recién creada (tablas vacías y sin uso previo).
-   - Las tablas con IDENTITY NO reciben el ID: lo genera SQL Server.
-     Como la base es nueva, los IDs salen 1, 2, 3... en el mismo orden
-     en que están escritos los INSERT. Las FK de más abajo usan esos
-     números, así que NO cambies el orden de las filas.
-   - Todo va en una transacción: si algo falla, no queda nada a medias.
-   - Los datos son coherentes entre sí:
-       * precio_unitario = precio_lista con la liquidación aplicada
-       * subtotal        = cantidad * precio_unitario
-       * descuento       = suma de subtotales * % del método de pago
-       * total           = suma de subtotales - descuento
-   ===================================================================== */
-
 USE tienda_ropa;
 GO
 
 -- =====================================================================
--- 1. Categoria (8 registros) -> IDs 1 a 8
+-- 1. Categoria (8 registros) 
 -- =====================================================================
 INSERT INTO Categoria (nombre, descripcion) VALUES
 ('Jeans Mujer',  'Pantalones de jean para mujer en distintos cortes'),   -- 1
@@ -32,7 +15,7 @@ INSERT INTO Categoria (nombre, descripcion) VALUES
 ('Accesorios',   'Cinturones, gorras y otros complementos');             -- 8
 
 -- =====================================================================
--- 2. Talle (10 registros) -> IDs 1 a 10
+-- 2. Talle (10 registros) 
 -- =====================================================================
 INSERT INTO Talle (descripcion) VALUES
 ('36'),     -- 1
@@ -47,7 +30,7 @@ INSERT INTO Talle (descripcion) VALUES
 ('Único');  -- 10
 
 -- =====================================================================
--- 3. Metodo_pago (8 registros) -> IDs 1 a 8
+-- 3. Metodo_pago (8 registros) 
 -- =====================================================================
 INSERT INTO Metodo_pago (nombre, porcentaje_descuento) VALUES
 ('Efectivo',                     15.00),  -- 1
@@ -60,7 +43,7 @@ INSERT INTO Metodo_pago (nombre, porcentaje_descuento) VALUES
 ('Gift card',                     0.00);  -- 8
 
 -- =====================================================================
--- 4. Cliente (10 registros) -> IDs 1 a 10
+-- 4. Cliente (10 registros) 
 -- =====================================================================
 INSERT INTO Cliente (nombre, apellido, dni, telefono, email, direccion) VALUES
 ('Lucía',     'Fernández', '38456123', '3794-551234', 'lucia.fernandez@mail.com',  'Junín 1250, Corrientes'),          -- 1
@@ -75,7 +58,7 @@ INSERT INTO Cliente (nombre, apellido, dni, telefono, email, direccion) VALUES
 ('Diego',     'Cabrera',   '34963258', '3794-849012', 'diego.cabrera@mail.com',    'Bolívar 1580, Corrientes');        -- 10
 
 -- =====================================================================
--- 5. Producto (10 registros) -> IDs 1 a 10
+-- 5. Producto (10 registros) 
 --    Los que están en liquidación tienen su % cargado; el resto, 0.
 -- =====================================================================
 INSERT INTO Producto (nombre, descripcion, precio_lista, en_liquidacion, porcentaje_liquidacion, Id_Categoria) VALUES
@@ -118,7 +101,7 @@ INSERT INTO Producto_Talle (Id_Producto, Id_Talle, stock) VALUES
 (10, 10, 30);
 
 -- =====================================================================
--- 7. Venta (10 registros) -> IDs 1 a 10
+-- 7. Venta (10 registros) 
 --    descuento_aplicado y total ya calculados según el detalle.
 -- =====================================================================
 INSERT INTO Venta (fecha_hora, canal, descuento_aplicado, total, Id_Cliente, Id_metodo_pago) VALUES

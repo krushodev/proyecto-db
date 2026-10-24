@@ -12,6 +12,7 @@ El sistema gestiona el catálogo de productos con stock **por talle**, el regist
 - [Modelo de datos](#modelo-de-datos)
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Cómo ejecutar](#cómo-ejecutar)
+- [Consultas (Etapa IV)](#consultas-etapa-iv)
 - [Etapas del proyecto](#etapas-del-proyecto)
 - [Reglas de negocio](#reglas-de-negocio)
 
@@ -69,12 +70,20 @@ docs/
 │   ├── modelo-relacional.md
 │   ├── normalizacion.md
 │   └── decisiones_de_disenio.md
-└── etapa-03/                      # Implementación
-    ├── ecommerce.sql              # DDL: crea la base y las tablas
-    ├── tienda_ropa_dml.sql        # DML: datos de prueba
-    ├── implementacion.md
-    ├── restricciones-integridad.md
-    └── pruebas-validacion.md
+├── etapa-03/                      # Implementación
+│   ├── ecommerce.sql              # DDL: crea la base y las tablas
+│   ├── tienda_ropa_dml.sql        # DML: datos de prueba
+│   ├── implementacion.md
+│   ├── restricciones-integridad.md
+│   └── pruebas-validacion.md
+└── etapa-04/                      # Consultas y casos de uso
+    ├── casos-uso.md
+    ├── comprobante_venta.sql      # CU-01: comprobante de venta
+    ├── comprobante-venta.md
+    ├── reporte_agregado.sql       # CU-02: ventas por categoría
+    ├── reporte-agregado.md
+    ├── consulta_avanzada.sql      # CU-03: clientes de mayor valor
+    └── consulta-avanzada.md
 ```
 
 ---
@@ -86,6 +95,7 @@ docs/
 1. Ejecutar [`docs/etapa-03/ecommerce.sql`](docs/etapa-03/ecommerce.sql). Crea la base `tienda_ropa` (si no existe) y las 8 tablas en orden de dependencia.
 2. Ejecutar [`docs/etapa-03/tienda_ropa_dml.sql`](docs/etapa-03/tienda_ropa_dml.sql). Carga los datos de prueba.
 3. Opcional: correr las consultas de [`pruebas-validacion.md`](docs/etapa-03/pruebas-validacion.md) para verificar la carga, la integridad y las restricciones.
+4. Ejecutar las consultas de la Etapa IV (ver [Consultas](#consultas-etapa-iv)). Cada una se corre por separado, después de cargar los datos de prueba.
 
 > Los scripts no son re-ejecutables sobre una base ya creada o poblada. Para volver a correrlos, eliminar antes las tablas o la base `tienda_ropa`.
 
@@ -104,6 +114,20 @@ docs/
 
 ---
 
+## Consultas (Etapa IV)
+
+Las necesidades de información de la etapa se modelan como casos de uso en [`casos-uso.md`](docs/etapa-04/casos-uso.md). Cada consulta tiene su script y un documento con la estrategia SQL, el resultado esperado y cómo probarla.
+
+| Caso de uso | Necesidad de información | Script | Documentación |
+| :--- | :--- | :--- | :--- |
+| **CU-01** | Comprobante de venta: encabezado y detalle, con subtotal por renglón y total acumulado. | [`comprobante_venta.sql`](docs/etapa-04/comprobante_venta.sql) | [`comprobante-venta.md`](docs/etapa-04/comprobante-venta.md) |
+| **CU-02** | Reporte agregado: total de ventas por categoría de producto en un rango de fechas (`GROUP BY`, `SUM`, `COUNT`, `ROLLUP`). | [`reporte_agregado.sql`](docs/etapa-04/reporte_agregado.sql) | [`reporte-agregado.md`](docs/etapa-04/reporte-agregado.md) |
+| **CU-03** | Consulta avanzada: clientes de mayor valor, combinando al menos 3 tablas con `JOIN` y filtros con `HAVING` o subconsultas. | [`consulta_avanzada.sql`](docs/etapa-04/consulta_avanzada.sql) | [`consulta-avanzada.md`](docs/etapa-04/consulta-avanzada.md) |
+
+> El modelo no tiene la entidad `Vendedor`, por eso el reporte agregado se agrupa por categoría de producto.
+
+---
+
 ## Etapas del proyecto
 
 | Etapa | Contenido | Estado |
@@ -111,7 +135,7 @@ docs/
 | **I** | Descripción del caso, alcance, reglas de negocio y decisiones de diseño | ✅ |
 | **II** | DER, modelo relacional y normalización hasta 3FN | ✅ |
 | **III** | Scripts DDL y DML, restricciones de integridad y pruebas de validación | ✅ |
-| **IV** | Consultas y reportes (reporte agregado por categoría de producto) | ⏳ |
+| **IV** | Casos de uso, comprobante de venta, reporte agregado por categoría y consulta de negocio avanzada | ⏳ |
 | **V** | Transacciones y triggers: validación y descuento automático de stock | ⏳ |
 
 ---

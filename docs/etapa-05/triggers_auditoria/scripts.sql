@@ -128,3 +128,129 @@ BEGIN
     WHERE i.stock <> d.stock;
 END;
 GO
+
+-- =====================================================================
+-- 4. PRUEBAS
+--    Cada prueba corre dentro de una transaccion que se deshace al final
+--    (ROLLBACK), asi la base de datos queda como estaba y las pruebas se
+--    pueden repetir. Cada una muestra solo las filas de Auditoria que
+--    genero (Id_Auditoria > @ultimo).
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- Prueba 1 (exito): cambio de precio de lista.
+-- Esperado: 1 fila UPDATE, Id_Producto=1, precio_lista 45000.00 -> 46000.00
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    UPDATE Producto SET precio_lista = 46000 WHERE Id_Producto = 1;
+    SELECT 'P1' AS prueba, operacion, clave, campo, valor_anterior, valor_nuevo, usuario, fecha_hora
+    FROM Auditoria WHERE Id_Auditoria > @ultimo ORDER BY Id_Auditoria;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 2 (caso limite): UPDATE que no cambia ningun valor.
+-- Esperado: 0 filas (el trigger no registra cambios inexistentes).
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    UPDATE Producto SET precio_lista = precio_lista WHERE Id_Producto = 2;
+    SELECT 'P2' AS prueba, COUNT(*) AS filas_auditadas
+    FROM Auditoria WHERE Id_Auditoria > @ultimo;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 3 (caso limite): un solo UPDATE sobre varias filas y varios campos.
+-- Esperado: 4 filas. Productos 1 y 6: en_liquidacion 0 -> 1 y
+-- porcentaje_liquidacion 0.00 -> 10.00 (una fila por producto y por campo).
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    UPDATE Producto SET en_liquidacion = 1, porcentaje_liquidacion = 10
+    WHERE Id_Producto IN (1, 6);
+    SELECT 'P3' AS prueba, operacion, clave, campo, valor_anterior, valor_nuevo
+    FROM Auditoria WHERE Id_Auditoria > @ultimo ORDER BY clave, campo;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 4 (exito): descuento de stock de un talle.
+-- Esperado: 1 fila UPDATE, Id_Producto=1, Id_Talle=2, stock 15 -> 14
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    UPDATE Producto_Talle SET stock = stock - 1 WHERE Id_Producto = 1 AND Id_Talle = 2;
+    SELECT 'P4' AS prueba, operacion, clave, campo, valor_anterior, valor_nuevo
+    FROM Auditoria WHERE Id_Auditoria > @ultimo ORDER BY Id_Auditoria;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 5 (caso limite): reposicion de stock en todos los talles de un producto.
+-- Esperado: 4 filas (producto 6, talles 6, 7, 8 y 9), todas con +5.
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    UPDATE Producto_Talle SET stock = stock + 5 WHERE Id_Producto = 6;
+    SELECT 'P5' AS prueba, operacion, clave, campo, valor_anterior, valor_nuevo
+    FROM Auditoria WHERE Id_Auditoria > @ultimo ORDER BY clave;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 6 (exito): alta y baja de un producto.
+-- Esperado: 2 filas, una INSERT (valor_nuevo con el resumen) y una DELETE
+-- (valor_anterior con el resumen).
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    INSERT INTO Producto (nombre, precio_lista, Id_Categoria) VALUES ('Producto de prueba', 100, 8);
+    DELETE FROM Producto WHERE nombre = 'Producto de prueba';
+    SELECT 'P6' AS prueba, operacion, clave, valor_anterior, valor_nuevo
+    FROM Auditoria WHERE Id_Auditoria > @ultimo ORDER BY Id_Auditoria;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 7 (error): stock negativo.
+-- Esperado: el CHECK de Producto_Talle rechaza el UPDATE y no queda
+-- ningun registro en Auditoria (0 filas).
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    BEGIN TRY
+        UPDATE Producto_Talle SET stock = -1 WHERE Id_Producto = 1 AND Id_Talle = 2;
+    END TRY
+    BEGIN CATCH
+        SELECT 'P7' AS prueba, ERROR_MESSAGE() AS error_recibido;
+    END CATCH;
+    SELECT 'P7' AS prueba, COUNT(*) AS filas_auditadas
+    FROM Auditoria WHERE Id_Auditoria > @ultimo;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 8 (error): borrar un producto que tiene stock y ventas asociadas.
+-- Esperado: la clave foranea lo rechaza y no queda registro en Auditoria.
+-- ---------------------------------------------------------------------
+DECLARE @ultimo INT = ISNULL((SELECT MAX(Id_Auditoria) FROM Auditoria), 0);
+BEGIN TRAN;
+    BEGIN TRY
+        DELETE FROM Producto WHERE Id_Producto = 1;
+    END TRY
+    BEGIN CATCH
+        SELECT 'P8' AS prueba, ERROR_MESSAGE() AS error_recibido;
+    END CATCH;
+    SELECT 'P8' AS prueba, COUNT(*) AS filas_auditadas
+    FROM Auditoria WHERE Id_Auditoria > @ultimo;
+ROLLBACK;
+GO
+
+-- ---------------------------------------------------------------------
+-- Prueba 9 (verificacion): despues de las pruebas la auditoria no
+-- conserva registros, porque cada una se deshizo con ROLLBACK.
+-- ---------------------------------------------------------------------
+SELECT 'P9' AS prueba, COUNT(*) AS filas_en_auditoria FROM Auditoria;
+GO

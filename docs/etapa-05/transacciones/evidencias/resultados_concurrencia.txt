@@ -1,0 +1,12 @@
+paso|stock
+----|-----
+preparado|1
+sesion|filas_actualizadas|resultado|ms_totales
+------|------------------|---------|----------
+SESION A|1|VENDIO la ultima unidad|10004
+sesion|filas_actualizadas|resultado|ms_esperando
+------|------------------|---------|------------
+SESION B|0|SIN STOCK: la venta se rechaza|6939
+paso|stock
+----|-----
+restablecido|10

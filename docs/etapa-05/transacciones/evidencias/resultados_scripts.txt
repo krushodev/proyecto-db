@@ -1,0 +1,31 @@
+prueba|resultado|ventas_nuevas|renglones_nuevos|filas_auditoria_nuevas
+------|---------|-------------|----------------|----------------------
+P1|COMMIT: venta 11 registrada|1|1|1
+prueba|Id_Producto|Id_Talle|stock_antes|stock_despues
+------|-----------|--------|-----------|-------------
+P1|8|1|10|8
+prueba|resultado|ventas_nuevas|renglones_nuevos|filas_auditoria_nuevas
+------|---------|-------------|----------------|----------------------
+P2|ROLLBACK: Stock insuficiente para uno o mas renglones.|0|0|0
+prueba|Id_Producto|Id_Talle|stock_antes|stock_despues
+------|-----------|--------|-----------|-------------
+P2|4|3|9|9
+prueba|resultado|ventas_nuevas|renglones_nuevos|filas_auditoria_nuevas
+------|---------|-------------|----------------|----------------------
+P3|ROLLBACK: Stock insuficiente para uno o mas renglones.|0|0|0
+prueba|Id_Producto|Id_Talle|stock_antes|stock_despues
+------|-----------|--------|-----------|-------------
+P3|4|4|5|5
+P3|8|2|10|10
+prueba|resultado|ventas_nuevas|renglones_nuevos|filas_auditoria_nuevas
+------|---------|-------------|----------------|----------------------
+P4|ROLLBACK: The INSERT statement conflicted with the FOREIGN KEY constraint "FK_DetalleVenta_ProductoTalle". The conflict occurred in database "tienda_ropa", table "dbo.Producto_Talle".|0|0|0
+Id_Venta|canal|metodo_pago|subtotal_renglones|descuento_aplicado|total|total_consistente
+--------|-----|-----------|------------------|------------------|-----|-----------------
+11|Local|Efectivo|56000.00|8400.00|47600.00|SI
+tabla|operacion|clave|campo|valor_anterior|valor_nuevo
+-----|---------|-----|-----|--------------|-----------
+Producto_Talle|UPDATE|Id_Producto=8, Id_Talle=1|stock|10|8
+ventas|renglones|stock_p8_t1
+------|---------|-----------
+10|17|10

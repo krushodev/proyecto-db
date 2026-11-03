@@ -84,3 +84,47 @@ BEGIN
     WHERE c.anterior <> c.nuevo;
 END;
 GO
+
+-- =====================================================================
+-- 3. TRIGGER: trg_Producto_Talle_Auditoria
+--    Audita el stock por talle (RN.02). Misma logica que el trigger de
+--    Producto. La PK es compuesta (Id_Producto, Id_Talle), por eso la
+--    clave registrada incluye ambas columnas.
+--    Se dispara en cada venta que descuente stock: es lo esperado, deja
+--    el historial de movimientos de inventario.
+-- =====================================================================
+CREATE OR ALTER TRIGGER trg_Producto_Talle_Auditoria
+ON Producto_Talle
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- INSERT: existe en inserted y no en deleted
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_nuevo)
+    SELECT 'Producto_Talle', 'INSERT',
+           CONCAT('Id_Producto=', i.Id_Producto, ', Id_Talle=', i.Id_Talle), 'stock',
+           CONVERT(VARCHAR(200), i.stock)
+    FROM inserted i
+    WHERE NOT EXISTS (SELECT 1 FROM deleted d
+                      WHERE d.Id_Producto = i.Id_Producto AND d.Id_Talle = i.Id_Talle);
+
+    -- DELETE: existe en deleted y no en inserted
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_anterior)
+    SELECT 'Producto_Talle', 'DELETE',
+           CONCAT('Id_Producto=', d.Id_Producto, ', Id_Talle=', d.Id_Talle), 'stock',
+           CONVERT(VARCHAR(200), d.stock)
+    FROM deleted d
+    WHERE NOT EXISTS (SELECT 1 FROM inserted i
+                      WHERE i.Id_Producto = d.Id_Producto AND i.Id_Talle = d.Id_Talle);
+
+    -- UPDATE: existe en ambas; se registra solo si el stock cambio
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_anterior, valor_nuevo)
+    SELECT 'Producto_Talle', 'UPDATE',
+           CONCAT('Id_Producto=', i.Id_Producto, ', Id_Talle=', i.Id_Talle), 'stock',
+           CONVERT(VARCHAR(200), d.stock), CONVERT(VARCHAR(200), i.stock)
+    FROM inserted i
+    JOIN deleted d ON d.Id_Producto = i.Id_Producto AND d.Id_Talle = i.Id_Talle
+    WHERE i.stock <> d.stock;
+END;
+GO

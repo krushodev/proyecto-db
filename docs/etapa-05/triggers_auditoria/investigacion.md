@@ -116,25 +116,42 @@ ORDER BY a.Id_Auditoria DESC;
 | :--- | :--- | :--- |
 | Producto 4 – *Jean Slim Fit Celeste*, precio 46000.00 | `UPDATE Producto SET precio_lista = 48000 WHERE Id_Producto = 4` | `producto`: Jean Slim Fit Celeste · `precio_anterior`: 46000.00 · `precio_nuevo`: 48000.00 · `operacion`: UPDATE · `usuario`: login que ejecutó · `fecha_hora`: momento del cambio |
 
+**Evidencia de la demo:**
+
+| Paso | Captura |
+| :--- | :--- |
+| Antes: el producto 4 cuesta 46000.00 | [`10_demo_antes.png`](evidencias/10_demo_antes.png) |
+| `UPDATE` del precio a 48000 | [`11_demo_update.png`](evidencias/11_demo_update.png) |
+| Registro generado automáticamente en `Auditoria` | [`12_demo_auditoria.png`](evidencias/12_demo_auditoria.png) |
+
+![Registro generado por el trigger](evidencias/12_demo_auditoria.png)
+
 > Para volver al precio original después de la demo: `UPDATE Producto SET precio_lista = 46000 WHERE Id_Producto = 4;`. Ese cambio también queda auditado, y es lo esperado.
 
 ### 5.2. Pruebas del script
 
 `scripts.sql` incluye 9 pruebas. Cada una corre dentro de una transacción que se deshace con `ROLLBACK`, así la base queda como estaba.
 
-| Prueba | Tipo | Caso | Resultado obtenido |
-| :-: | :-: | :--- | :--- |
-| P1 | Éxito | Cambio de precio del producto 1 | 1 fila: 45000.00 → 46000.00 |
-| P2 | Límite | `UPDATE` que no cambia ningún valor | 0 filas |
-| P3 | Límite | Un `UPDATE` sobre 2 productos y 2 campos | 4 filas (una por producto y campo) |
-| P4 | Éxito | Descuento de stock (producto 1, talle 2) | 1 fila: 15 → 14 |
-| P5 | Límite | Reposición en los 4 talles del producto 6 | 4 filas |
-| P6 | Éxito | Alta y baja de un producto | 2 filas (`INSERT` y `DELETE`) |
-| P7 | Error | Stock negativo | El `CHECK` lo rechaza; 0 filas en `Auditoria` |
-| P8 | Error | Borrar un producto con stock asociado | La clave foránea lo rechaza; 0 filas en `Auditoria` |
-| P9 | Verificación | Estado final de `Auditoria` | 0 filas (todo se deshizo) |
+| Prueba | Tipo | Caso | Resultado obtenido | Evidencia |
+| :-: | :-: | :--- | :--- | :--- |
+| P1 | Éxito | Cambio de precio del producto 1 | 1 fila: 45000.00 → 46000.00 | [`02_p1_cambio_precio.png`](evidencias/02_p1_cambio_precio.png) |
+| P2 | Límite | `UPDATE` que no cambia ningún valor | 0 filas | [`03_p2_sin_cambios.png`](evidencias/03_p2_sin_cambios.png) |
+| P3 | Límite | Un `UPDATE` sobre 2 productos y 2 campos | 4 filas (una por producto y campo) | [`04_p3_varias_filas.png`](evidencias/04_p3_varias_filas.png) |
+| P4 | Éxito | Descuento de stock (producto 1, talle 2) | 1 fila: 15 → 14 | [`05_p4_stock.png`](evidencias/05_p4_stock.png) |
+| P5 | Límite | Reposición en los 4 talles del producto 6 | 4 filas | [`06_p5_stock_varias_filas.png`](evidencias/06_p5_stock_varias_filas.png) |
+| P6 | Éxito | Alta y baja de un producto | 2 filas (`INSERT` y `DELETE`) | [`07_p6_insert_delete.png`](evidencias/07_p6_insert_delete.png) |
+| P7 | Error | Stock negativo | El `CHECK` lo rechaza; 0 filas en `Auditoria` | [`08_p7_stock_negativo.png`](evidencias/08_p7_stock_negativo.png) |
+| P8 | Error | Borrar un producto con stock asociado | La clave foránea lo rechaza; 0 filas en `Auditoria` | [`09_p8_fk.png`](evidencias/09_p8_fk.png) |
+| P9 | Verificación | Estado final de `Auditoria` | 0 filas (todo se deshizo) | [`09b_p9_verificacion.png`](evidencias/09b_p9_verificacion.png) |
 
-Las capturas de cada prueba están en [`evidencias/`](evidencias/).
+### 5.3. Evidencia de la creación de los objetos
+
+| Objeto | Captura |
+| :--- | :--- |
+| Tabla `Auditoria` | [`01a_creacion_tabla_auditoria.png`](evidencias/01a_creacion_tabla_auditoria.png) |
+| Trigger `trg_Producto_Auditoria` | [`01b_creacion_trigger_producto.png`](evidencias/01b_creacion_trigger_producto.png) |
+| Trigger `trg_Producto_Talle_Auditoria` | [`01c_creacion_trigger_producto_talle.png`](evidencias/01c_creacion_trigger_producto_talle.png) |
+| Verificación de que los triggers existen | [`01d_verificacion_objetos.png`](evidencias/01d_verificacion_objetos.png) |
 
 ## 6. Integración con seguridad
 

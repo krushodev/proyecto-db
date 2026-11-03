@@ -24,18 +24,22 @@ DECLARE @fecha_hasta DATETIME2(0) = '2026-09-30';   -- inclusive (se compara < d
 SELECT
     c.Id_Categoria,
     c.nombre                                   AS categoria,
-    COUNT(DISTINCT v.Id_Venta)                 AS cant_ventas,
+    COUNT(DISTINCT dv.Id_Venta)                AS cant_ventas,
     COUNT(dv.nro_item)                         AS cant_items,
     COALESCE(SUM(dv.cantidad), 0)              AS unidades,
     COALESCE(SUM(dv.subtotal), 0)              AS total_vendido,
-    COALESCE(SUM(dv.subtotal) / NULLIF(COUNT(DISTINCT v.Id_Venta), 0), 0) AS ticket_promedio
+    COALESCE(SUM(dv.subtotal) / NULLIF(COUNT(DISTINCT dv.Id_Venta), 0), 0) AS ticket_promedio
 FROM Categoria c
 LEFT JOIN Producto p        ON p.Id_Categoria = c.Id_Categoria
-LEFT JOIN Detalle_Venta dv  ON dv.Id_Producto = p.Id_Producto
-LEFT JOIN Venta v           ON v.Id_Venta = dv.Id_Venta
-                           AND v.fecha_hora >= @fecha_desde
-                           AND v.fecha_hora <  DATEADD(DAY, 1, @fecha_hasta)
-WHERE dv.Id_Venta IS NULL OR v.Id_Venta IS NOT NULL   -- descarta renglones de ventas fuera del rango
+-- El rango de fechas se aplica dentro del LEFT JOIN (renglones de ventas del rango),
+-- asi las categorias sin ventas en el rango siguen apareciendo con valores en 0.
+LEFT JOIN (
+    SELECT d.Id_Producto, d.Id_Venta, d.nro_item, d.cantidad, d.subtotal
+    FROM Detalle_Venta d
+    JOIN Venta v ON v.Id_Venta = d.Id_Venta
+    WHERE v.fecha_hora >= @fecha_desde
+      AND v.fecha_hora <  DATEADD(DAY, 1, @fecha_hasta)
+) dv                        ON dv.Id_Producto = p.Id_Producto
 GROUP BY c.Id_Categoria, c.nombre
 ORDER BY total_vendido DESC;
 GO

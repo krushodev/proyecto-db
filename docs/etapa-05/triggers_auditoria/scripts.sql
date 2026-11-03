@@ -36,3 +36,51 @@ BEGIN
     );
 END;
 GO
+
+-- =====================================================================
+-- 2. TRIGGER: trg_Producto_Auditoria
+--    Audita precio de lista y liquidacion de Producto (RN.05 y RN.06).
+--    - UPDATE: una fila por cada campo que realmente cambio (si el valor
+--      nuevo es igual al anterior, no registra nada).
+--    - INSERT / DELETE: una fila por producto con el resumen del registro.
+--    Es set-based: funciona igual con una fila o con muchas en un mismo
+--    comando, porque trabaja con las tablas inserted y deleted.
+-- =====================================================================
+CREATE OR ALTER TRIGGER trg_Producto_Auditoria
+ON Producto
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- INSERT: existe en inserted y no en deleted
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_nuevo)
+    SELECT 'Producto', 'INSERT', CONCAT('Id_Producto=', i.Id_Producto), NULL,
+           CONCAT(i.nombre, ' | precio_lista=', i.precio_lista,
+                  ' | en_liquidacion=', i.en_liquidacion,
+                  ' | porcentaje_liquidacion=', i.porcentaje_liquidacion)
+    FROM inserted i
+    WHERE NOT EXISTS (SELECT 1 FROM deleted d WHERE d.Id_Producto = i.Id_Producto);
+
+    -- DELETE: existe en deleted y no en inserted
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_anterior)
+    SELECT 'Producto', 'DELETE', CONCAT('Id_Producto=', d.Id_Producto), NULL,
+           CONCAT(d.nombre, ' | precio_lista=', d.precio_lista,
+                  ' | en_liquidacion=', d.en_liquidacion,
+                  ' | porcentaje_liquidacion=', d.porcentaje_liquidacion)
+    FROM deleted d
+    WHERE NOT EXISTS (SELECT 1 FROM inserted i WHERE i.Id_Producto = d.Id_Producto);
+
+    -- UPDATE: existe en ambas; se registra solo lo que cambio
+    INSERT INTO Auditoria (tabla, operacion, clave, campo, valor_anterior, valor_nuevo)
+    SELECT 'Producto', 'UPDATE', CONCAT('Id_Producto=', i.Id_Producto), c.campo, c.anterior, c.nuevo
+    FROM inserted i
+    JOIN deleted d ON d.Id_Producto = i.Id_Producto
+    CROSS APPLY (VALUES
+        ('precio_lista',           CONVERT(VARCHAR(200), d.precio_lista),           CONVERT(VARCHAR(200), i.precio_lista)),
+        ('en_liquidacion',         CONVERT(VARCHAR(200), d.en_liquidacion),         CONVERT(VARCHAR(200), i.en_liquidacion)),
+        ('porcentaje_liquidacion', CONVERT(VARCHAR(200), d.porcentaje_liquidacion), CONVERT(VARCHAR(200), i.porcentaje_liquidacion))
+    ) AS c (campo, anterior, nuevo)
+    WHERE c.anterior <> c.nuevo;
+END;
+GO

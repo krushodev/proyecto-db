@@ -13,6 +13,7 @@ El sistema gestiona el catálogo de productos con stock **por talle**, el regist
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Cómo ejecutar](#cómo-ejecutar)
 - [Consultas (Etapa IV)](#consultas-etapa-iv)
+- [Seguridad (Etapa V)](#seguridad-etapa-v)
 - [Etapas del proyecto](#etapas-del-proyecto)
 - [Reglas de negocio](#reglas-de-negocio)
 
@@ -76,14 +77,18 @@ docs/
 │   ├── implementacion.md
 │   ├── restricciones-integridad.md
 │   └── pruebas-validacion.md
-└── etapa-04/                      # Consultas y casos de uso
-    ├── casos-uso.md
-    ├── comprobante_venta.sql      # CU-01: comprobante de venta
-    ├── comprobante-venta.md
-    ├── reporte_agregado.sql       # CU-02: ventas por categoría
-    ├── reporte-agregado.md
-    ├── consulta_avanzada.sql      # CU-03: clientes de mayor valor
-    └── consulta-avanzada.md
+├── etapa-04/                      # Consultas y casos de uso
+│   ├── casos-uso.md
+│   ├── comprobante_venta.sql      # CU-01: comprobante de venta
+│   ├── comprobante-venta.md
+│   ├── reporte_agregado.sql       # CU-02: ventas por categoría
+│   ├── reporte-agregado.md
+│   ├── consulta_avanzada.sql      # CU-03: clientes de mayor valor
+│   └── consulta-avanzada.md
+└── etapa-05/                      # Temas técnicos
+    ├── seguridad.sql              # Roles, permisos y enmascaramiento
+    ├── seguridad_pruebas.sql      # Pruebas de permisos
+    └── seguridad.md
 ```
 
 ---
@@ -96,8 +101,9 @@ docs/
 2. Ejecutar [`docs/etapa-03/tienda_ropa_dml.sql`](docs/etapa-03/tienda_ropa_dml.sql). Carga los datos de prueba.
 3. Opcional: correr las consultas de [`pruebas-validacion.md`](docs/etapa-03/pruebas-validacion.md) para verificar la carga, la integridad y las restricciones.
 4. Ejecutar las consultas de la Etapa IV (ver [Consultas](#consultas-etapa-iv)). Cada una se corre por separado, después de cargar los datos de prueba.
+5. Ejecutar [`docs/etapa-05/seguridad.sql`](docs/etapa-05/seguridad.sql) y después [`docs/etapa-05/seguridad_pruebas.sql`](docs/etapa-05/seguridad_pruebas.sql). Crean los roles y permisos, y verifican que funcionen.
 
-> Los scripts no son re-ejecutables sobre una base ya creada o poblada. Para volver a correrlos, eliminar antes las tablas o la base `tienda_ropa`.
+> Los scripts de la Etapa III no son re-ejecutables sobre una base ya creada o poblada. Para volver a correrlos, eliminar antes las tablas o la base `tienda_ropa`. `seguridad.sql` sí se puede volver a ejecutar.
 
 ### Datos de prueba
 
@@ -128,6 +134,17 @@ Las necesidades de información de la etapa se modelan como casos de uso en [`ca
 
 ---
 
+## Seguridad (Etapa V)
+
+Aplica el principio de mínimo privilegio con roles basados en los actores de los casos de uso. El detalle y los resultados de las pruebas están en [`seguridad.md`](docs/etapa-05/seguridad.md).
+
+| Rol | Puede | No puede |
+| :--- | :--- | :--- |
+| `rol_mostrador` | Consultar el catálogo, registrar clientes y ventas, y actualizar el stock. | Cambiar precios, borrar datos ni ver el contacto completo de los clientes. |
+| `rol_administrador` | Todo lo anterior, gestionar el catálogo y los precios, y ver el contacto completo de los clientes. | Modificar o borrar ventas registradas, ni borrar clientes. |
+
+---
+
 ## Etapas del proyecto
 
 | Etapa | Contenido | Estado |
@@ -136,7 +153,7 @@ Las necesidades de información de la etapa se modelan como casos de uso en [`ca
 | **II** | DER, modelo relacional y normalización hasta 3FN | ✅ |
 | **III** | Scripts DDL y DML, restricciones de integridad y pruebas de validación | ✅ |
 | **IV** | Casos de uso, comprobante de venta, reporte agregado por categoría y consulta de negocio avanzada | ⏳ |
-| **V** | Transacciones y triggers: validación y descuento automático de stock | ⏳ |
+| **V** | Procedimientos y funciones, transacciones, triggers de auditoría, seguridad y optimización de consultas | ⏳ |
 
 ---
 

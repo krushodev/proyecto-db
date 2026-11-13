@@ -151,6 +151,8 @@ BEGIN
         -- ---- 2. Bloqueo de stock y verificacion (RN.02) ---------------
         --    UPDLOCK + HOLDLOCK evitan que otra venta simultanea consuma
         --    el mismo stock entre la verificacion y el descuento.
+        --    Se recorren todas las filas (COUNT) para tomar el bloqueo de
+        --    cada una; el conteo en si no se usa despues.
         DECLARE @filas_bloqueadas INT;
 
         SELECT @filas_bloqueadas = COUNT(*)
@@ -158,6 +160,10 @@ BEGIN
         JOIN @Detalle d
           ON d.Id_Producto = pt.Id_Producto
          AND d.Id_Talle    = pt.Id_Talle;
+
+        -- Salvaguarda: cada renglon debe haber quedado bloqueado.
+        IF @filas_bloqueadas <> (SELECT COUNT(*) FROM @Detalle)
+            THROW 50006, 'Hay un renglon con una combinacion producto-talle inexistente', 1;
 
         IF EXISTS (SELECT 1
                    FROM @Detalle d

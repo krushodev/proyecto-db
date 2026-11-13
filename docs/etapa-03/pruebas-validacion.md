@@ -2,7 +2,7 @@
 
 Este documento reúne las pruebas diseñadas para validar la base de datos `tienda_ropa`, una vez ejecutados en orden `ecommerce.sql` (DDL) y `tienda_ropa_dml.sql` (DML).
 
-> **Estado:** las consultas están listas para ejecutarse. La columna **Resultado obtenido** debe completarse tras correrlas en SQL Server Management Studio.
+> **Estado:** pruebas ejecutadas en SQL Server Management Studio el 13/11/2026 sobre la base cargada con `ecommerce.sql` y `tienda_ropa_dml.sql`. Las 40 pruebas dieron el resultado esperado.
 
 ---
 
@@ -26,14 +26,14 @@ SELECT 'Detalle_Venta',           COUNT(*)               FROM Detalle_Venta;
 
 | Tabla | Esperado | Resultado obtenido |
 | :--- | :---: | :--- |
-| `Categoria` | 8 | |
-| `Talle` | 10 | |
-| `Metodo_pago` | 8 | |
-| `Cliente` | 10 | |
-| `Producto` | 10 | |
-| `Producto_Talle` | 24 | |
-| `Venta` | 10 | |
-| `Detalle_Venta` | 17 | |
+| `Categoria` | 8 | 8 |
+| `Talle` | 10 | 10 |
+| `Metodo_pago` | 8 | 8 |
+| `Cliente` | 10 | 10 |
+| `Producto` | 10 | 10 |
+| `Producto_Talle` | 24 | 24 |
+| `Venta` | 10 | 10 |
+| `Detalle_Venta` | 17 | 17 |
 
 ---
 
@@ -67,10 +67,10 @@ WHERE pt.Id_Producto IS NULL;
 
 | Verificación | Esperado | Resultado obtenido |
 | :--- | :---: | :--- |
-| Productos sin categoría | 0 | |
-| Ventas sin cliente o método de pago | 0 | |
-| Renglones sin venta | 0 | |
-| Renglones con producto-talle inexistente | 0 | |
+| Productos sin categoría | 0 | 0 |
+| Ventas sin cliente o método de pago | 0 | 0 |
+| Renglones sin venta | 0 | 0 |
+| Renglones con producto-talle inexistente | 0 | 0 |
 
 ---
 
@@ -117,11 +117,11 @@ WHERE (en_liquidacion = 1 AND porcentaje_liquidacion = 0)
 
 | Verificación | Esperado | Resultado obtenido |
 | :--- | :---: | :--- |
-| 3.1 Subtotales incorrectos | 0 filas | |
-| 3.2 Precios sin liquidación aplicada | 0 filas | |
-| 3.3 Descuentos o totales incorrectos | 0 filas | |
-| 3.4 Ventas sin renglones | 0 filas | |
-| 3.5 Liquidaciones inconsistentes | 0 filas | |
+| 3.1 Subtotales incorrectos | 0 filas | 0 filas |
+| 3.2 Precios sin liquidación aplicada | 0 filas | 0 filas |
+| 3.3 Descuentos o totales incorrectos | 0 filas | 0 filas |
+| 3.4 Ventas sin renglones | 0 filas | 0 filas |
+| 3.5 Liquidaciones inconsistentes | 0 filas | 0 filas |
 
 ---
 
@@ -144,20 +144,20 @@ ROLLBACK TRANSACTION;
 
 | Nº | Prueba | Sentencia a ejecutar | Resultado esperado | Resultado obtenido |
 | :-: | :--- | :--- | :--- | :--- |
-| 1 | DNI duplicado | `INSERT INTO Cliente (nombre, apellido, dni, email) VALUES ('Test','Uno','38456123','test1@mail.com');` | Rechazada: viola la unicidad del DNI | |
-| 2 | Email duplicado | `INSERT INTO Cliente (nombre, apellido, dni, email) VALUES ('Test','Dos','99999999','lucia.fernandez@mail.com');` | Rechazada: viola la unicidad del email | |
-| 3 | Cliente sin email | `INSERT INTO Cliente (nombre, apellido, dni) VALUES ('Test','Tres','88888888');` | Rechazada: el email es obligatorio | |
-| 4 | Stock negativo | `UPDATE Producto_Talle SET stock = -1 WHERE Id_Producto = 1 AND Id_Talle = 1;` | Rechazada: el stock no puede ser negativo | |
-| 5 | Descuento de pago mayor a 100 | `INSERT INTO Metodo_pago (nombre, porcentaje_descuento) VALUES ('Test', 150);` | Rechazada: el porcentaje debe estar entre 0 y 100 | |
-| 6 | Liquidación mayor a 100 | `UPDATE Producto SET porcentaje_liquidacion = 120 WHERE Id_Producto = 1;` | Rechazada: el porcentaje debe estar entre 0 y 100 | |
-| 7 | Precio de lista negativo | `UPDATE Producto SET precio_lista = -10 WHERE Id_Producto = 1;` | Rechazada: el precio no puede ser negativo | |
-| 8 | Cantidad cero en un renglón | `INSERT INTO Detalle_Venta VALUES (1, 99, 1, 1, 0, 45000, 0);` | Rechazada: la cantidad debe ser mayor a 0 | |
-| 9 | Producto-talle inexistente | `INSERT INTO Detalle_Venta VALUES (1, 99, 1, 9, 1, 45000, 45000);` | Rechazada: la combinación producto-talle no existe | |
-| 10 | Venta con cliente inexistente | `INSERT INTO Venta (canal, Id_Cliente, Id_metodo_pago) VALUES ('Web', 999, 1);` | Rechazada: el cliente no existe | |
-| 11 | Producto con categoría inexistente | `INSERT INTO Producto (nombre, precio_lista, Id_Categoria) VALUES ('Test', 1000, 999);` | Rechazada: la categoría no existe | |
-| 12 | Borrar categoría con productos | `DELETE FROM Categoria WHERE Id_Categoria = 1;` | Rechazada: tiene productos asociados | |
-| 13 | Borrar cliente con ventas | `DELETE FROM Cliente WHERE Id_Cliente = 1;` | Rechazada: tiene ventas asociadas | |
-| 14 | Repetir `nro_item` en una venta | `INSERT INTO Detalle_Venta VALUES (1, 1, 6, 6, 1, 15000, 15000);` | Rechazada: la clave (venta, ítem) ya existe | |
+| 1 | DNI duplicado | `INSERT INTO Cliente (nombre, apellido, dni, email) VALUES ('Test','Uno','38456123','test1@mail.com');` | Rechazada: viola la unicidad del DNI | Rechazada: `UQ_Cliente_dni` (clave duplicada 38456123) |
+| 2 | Email duplicado | `INSERT INTO Cliente (nombre, apellido, dni, email) VALUES ('Test','Dos','99999999','lucia.fernandez@mail.com');` | Rechazada: viola la unicidad del email | Rechazada: `UQ_Cliente_email` (clave duplicada lucia.fernandez@mail.com) |
+| 3 | Cliente sin email | `INSERT INTO Cliente (nombre, apellido, dni) VALUES ('Test','Tres','88888888');` | Rechazada: el email es obligatorio | Rechazada: la columna `email` no admite `NULL` |
+| 4 | Stock negativo | `UPDATE Producto_Talle SET stock = -1 WHERE Id_Producto = 1 AND Id_Talle = 1;` | Rechazada: el stock no puede ser negativo | Rechazada: `CHK_Producto_Talle_stock` |
+| 5 | Descuento de pago mayor a 100 | `INSERT INTO Metodo_pago (nombre, porcentaje_descuento) VALUES ('Test', 150);` | Rechazada: el porcentaje debe estar entre 0 y 100 | Rechazada: `CHK_Metodo_pago_descuento` |
+| 6 | Liquidación mayor a 100 | `UPDATE Producto SET porcentaje_liquidacion = 120 WHERE Id_Producto = 1;` | Rechazada: el porcentaje debe estar entre 0 y 100 | Rechazada: `CHK_Producto_porcentaje` |
+| 7 | Precio de lista negativo | `UPDATE Producto SET precio_lista = -10 WHERE Id_Producto = 1;` | Rechazada: el precio no puede ser negativo | Rechazada: `CHK_Producto_precio` |
+| 8 | Cantidad cero en un renglón | `INSERT INTO Detalle_Venta VALUES (1, 99, 1, 1, 0, 45000, 0);` | Rechazada: la cantidad debe ser mayor a 0 | Rechazada: `CHK_DetalleVenta_cantidad` |
+| 9 | Producto-talle inexistente | `INSERT INTO Detalle_Venta VALUES (1, 99, 1, 9, 1, 45000, 45000);` | Rechazada: la combinación producto-talle no existe | Rechazada: `FK_DetalleVenta_ProductoTalle` |
+| 10 | Venta con cliente inexistente | `INSERT INTO Venta (canal, Id_Cliente, Id_metodo_pago) VALUES ('Web', 999, 1);` | Rechazada: el cliente no existe | Rechazada: `FK_Venta_Cliente` |
+| 11 | Producto con categoría inexistente | `INSERT INTO Producto (nombre, precio_lista, Id_Categoria) VALUES ('Test', 1000, 999);` | Rechazada: la categoría no existe | Rechazada: `FK_Producto_Categoria` |
+| 12 | Borrar categoría con productos | `DELETE FROM Categoria WHERE Id_Categoria = 1;` | Rechazada: tiene productos asociados | Rechazada: `FK_Producto_Categoria` (referencia desde `Producto`) |
+| 13 | Borrar cliente con ventas | `DELETE FROM Cliente WHERE Id_Cliente = 1;` | Rechazada: tiene ventas asociadas | Rechazada: `FK_Venta_Cliente` (referencia desde `Venta`) |
+| 14 | Repetir `nro_item` en una venta | `INSERT INTO Detalle_Venta VALUES (1, 1, 6, 6, 1, 15000, 15000);` | Rechazada: la clave (venta, ítem) ya existe | Rechazada: `PK_Detalle_Venta` (clave duplicada (1, 1)) |
 
 ---
 
@@ -177,7 +177,7 @@ ROLLBACK TRANSACTION;
 
 | Resultado esperado | Resultado obtenido |
 | :--- | :--- |
-| `fecha_hora` con la fecha y hora actuales; `descuento_aplicado` y `total` en `0.00` | |
+| `fecha_hora` con la fecha y hora actuales; `descuento_aplicado` y `total` en `0.00` | `fecha_hora` con la fecha y hora actuales; `descuento_aplicado = 0.00` y `total = 0.00` |
 
 ### 5.2. Borrado en cascada de una venta
 
@@ -192,7 +192,7 @@ ROLLBACK TRANSACTION;
 
 | Resultado esperado | Resultado obtenido |
 | :--- | :--- |
-| `renglones_restantes = 0` (la venta 1 tenía 2 renglones) | |
+| `renglones_restantes = 0` (la venta 1 tenía 2 renglones) | `renglones_restantes = 0` |
 
 ---
 
@@ -253,13 +253,13 @@ GROUP BY m.nombre;
 
 | Consulta | Resultado esperado | Resultado obtenido |
 | :--- | :--- | :--- |
-| 6.1 | Una fila por canal: `Local`, `Web`, `Instagram` y `WhatsApp` | |
-| 6.2 | Una fila por producto (10 filas) | |
-| 6.3 | 3 renglones para la venta 5 | |
-| 6.4 | 4 productos en liquidación | |
-| 6.5 | `Remera Básica Algodón` encabeza la lista | |
-| 6.6 | 1 cliente con más de una compra (Fernández, Lucía) | |
-| 6.7 | Una fila por método de pago utilizado en las ventas | |
+| 6.1 | Una fila por canal: `Local`, `Web`, `Instagram` y `WhatsApp` | 4 filas: Local (4 ventas, 271970.00), Web (3, 194800.00), Instagram (2, 83240.00) y WhatsApp (1, 38250.00) |
+| 6.2 | Una fila por producto (10 filas) | 10 filas |
+| 6.3 | 3 renglones para la venta 5 | 3 renglones |
+| 6.4 | 4 productos en liquidación | 4 productos |
+| 6.5 | `Remera Básica Algodón` encabeza la lista | `Remera Básica Algodón` con 7 unidades |
+| 6.6 | 1 cliente con más de una compra (Fernández, Lucía) | 1 cliente: Fernández, Lucía (2 compras) |
+| 6.7 | Una fila por método de pago utilizado en las ventas | 7 métodos de pago utilizados |
 
 ---
 
@@ -267,21 +267,21 @@ GROUP BY m.nombre;
 
 Observaciones sobre la consistencia entre scripts y documentación:
 
-- El comentario del DML indica 28 registros en `Producto_Talle`, pero el `INSERT` carga **24**.
-- Los canales de venta de los datos de prueba (`Local`, `Web`, `Instagram`, `WhatsApp`) no coinciden con los valores del modelo relacional de la etapa 2 (`Mostrador` / `Online`).
+- El comentario del DML indicaba 28 registros en `Producto_Talle`, pero el `INSERT` carga **24**. **Corregido:** el comentario ahora dice 24.
+- Los canales de venta de los datos de prueba (`Local`, `Web`, `Instagram`, `WhatsApp`) no coincidían con los valores del modelo relacional de la etapa 2 (`Mostrador` / `Online`). **Corregido:** el modelo relacional, las decisiones de diseño y el README usan los valores reales.
 - La carga de ventas **no descuenta stock** de `Producto_Talle`: el stock inicial no refleja las unidades vendidas en los datos de prueba.
 
 ---
 
 ## 8. Conclusión
 
-*Completar tras ejecutar las pruebas: cantidad de pruebas ejecutadas, cantidad aprobadas y observaciones.*
+Se ejecutaron **40 pruebas** y **las 40 dieron el resultado esperado**. Las pruebas negativas fueron todas rechazadas por la base, con el tipo de error esperado en cada caso (unicidad, `NOT NULL`, `CHECK`, clave foránea y clave primaria).
 
 | Sección | Pruebas | Aprobadas |
 | :--- | :---: | :---: |
-| 1. Carga de datos | 8 | |
-| 2. Integridad referencial | 4 | |
-| 3. Consistencia | 5 | |
-| 4. Pruebas negativas | 14 | |
-| 5. Comportamiento | 2 | |
-| 6. Consultas de negocio | 7 | |
+| 1. Carga de datos | 8 | 8 |
+| 2. Integridad referencial | 4 | 4 |
+| 3. Consistencia | 5 | 5 |
+| 4. Pruebas negativas | 14 | 14 |
+| 5. Comportamiento | 2 | 2 |
+| 6. Consultas de negocio | 7 | 7 |

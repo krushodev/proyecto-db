@@ -4,7 +4,7 @@
 
 La optimización de consultas SQL no depende únicamente de la infraestructura o estructuras avanzadas del motor, sino en gran medida de cómo escribimos el código T-SQL. Escribir consultas eficientes reduce el consumo de CPU, disminuye el uso de memoria RAM temporal en el servidor y acelera la respuesta del sistema.
 
-En esta etapa se documentan las mejores prácticas de refactorización de código aplicadas al modelo de datos del proyecto (`COMPRA`, `DETALLEDECOMPRA`, `CLIENTE`, `METODO_DE_PAGO`).
+En esta etapa se documentan las mejores prácticas de refactorización de código aplicadas al modelo de datos del proyecto (`Venta`, `Detalle_Venta`, `Cliente`, `Metodo_pago`).
 
 ---
 

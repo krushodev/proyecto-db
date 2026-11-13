@@ -10,9 +10,9 @@
 
 ## 1. Introducción
 
-El presente documento define formalmente el conjunto de **Restricciones de Integridad** aplicables a la base de datos relacional de **Intensa Jeans**. Estas restricciones garantizan la consistencia, exactitud, validez y coherencia de los datos almacenados, alineándose con las Reglas de Negocio (RN.01 a RN.09) identificadas en la Etapa I del proyecto.
+El presente documento define formalmente el conjunto de **Restricciones de Integridad** aplicables a la base de datos relacional de **Intensa Jeans**. Estas restricciones garantizan la consistencia, exactitud, validez y coherencia de los datos almacenados, alineándose con las Reglas de Negocio (RN.01 a RN.10) identificadas en la Etapa I del proyecto.
 
-Las restricciones se clasifican en cuatro categorías fundamentales:
+Las restricciones se clasifican en cinco categorías fundamentales:
 
 1. **Integridad de Entidad:** Definición de Claves Primarias (PK).
 
@@ -101,96 +101,124 @@ Define el conjunto de valores válidos admitidos por cada atributo dentro de las
 
 ### 4.1. Definición por Entidad
 
-```
--- 1. Categoria
+```sql
+-- 1. TABLA: Categoria
 CREATE TABLE Categoria (
-    Id_Categoria INT AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL,
+    Id_Categoria INT IDENTITY(1,1) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     descripcion VARCHAR(255) NULL,
     CONSTRAINT PK_Categoria PRIMARY KEY (Id_Categoria)
 );
 
--- 2. Producto
-CREATE TABLE Producto (
-    Id_Producto INT AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT NULL,
-    precio_lista DECIMAL(10,2) NOT NULL,
-    en_liquidacion BOOLEAN NOT NULL DEFAULT FALSE,
-    porcentaje_liquidacion DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    Id_Categoria INT NOT NULL,
-    CONSTRAINT PK_Producto PRIMARY KEY (Id_Producto),
-    CONSTRAINT CHK_PrecioLista_Positivo CHECK (precio_lista >= 0),
-    CONSTRAINT CHK_PorcentajeLiq_Rango CHECK (porcentaje_liquidacion BETWEEN 0.00 AND 100.00)
-);
-
--- 3. Talle
+-- 2. TABLA: Talle
 CREATE TABLE Talle (
-    Id_Talle INT AUTO_INCREMENT,
-    descripcion VARCHAR(20) NOT NULL,
+    Id_Talle INT IDENTITY(1,1) NOT NULL,
+    descripcion VARCHAR(50) NOT NULL,
     CONSTRAINT PK_Talle PRIMARY KEY (Id_Talle)
 );
 
--- 4. Producto_Talle
+-- 3. TABLA: Metodo_pago
+CREATE TABLE Metodo_pago (
+    Id_metodo_pago INT IDENTITY(1,1) NOT NULL,
+    nombre VARCHAR(80) NOT NULL,
+    porcentaje_descuento DECIMAL(5, 2) NOT NULL CONSTRAINT DF_Metodo_pago_descuento DEFAULT (0.00),
+    CONSTRAINT PK_Metodo_pago PRIMARY KEY (Id_metodo_pago),
+    CONSTRAINT CHK_Metodo_pago_descuento CHECK (porcentaje_descuento >= 0 AND porcentaje_descuento <= 100)
+);
+
+-- 4. TABLA: Cliente
+CREATE TABLE Cliente (
+    Id_Cliente INT IDENTITY(1,1) NOT NULL,
+    nombre VARCHAR(80) NOT NULL,
+    apellido VARCHAR(80) NOT NULL,
+    dni VARCHAR(20) NOT NULL,
+    telefono VARCHAR(30) NULL,
+    email VARCHAR(120) NOT NULL,
+    direccion VARCHAR(200) NULL,
+    CONSTRAINT PK_Cliente PRIMARY KEY (Id_Cliente),
+    CONSTRAINT UQ_Cliente_dni UNIQUE (dni),
+    CONSTRAINT UQ_Cliente_email UNIQUE (email)
+);
+
+-- 5. TABLA: Producto
+CREATE TABLE Producto (
+    Id_Producto INT IDENTITY(1,1) NOT NULL,
+    nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(500) NULL,
+    precio_lista DECIMAL(10, 2) NOT NULL,
+    en_liquidacion BIT NOT NULL CONSTRAINT DF_Producto_en_liquidacion DEFAULT (0),
+    porcentaje_liquidacion DECIMAL(5, 2) NOT NULL CONSTRAINT DF_Producto_porcentaje DEFAULT (0.00),
+    Id_Categoria INT NOT NULL,
+    CONSTRAINT PK_Producto PRIMARY KEY (Id_Producto),
+    CONSTRAINT FK_Producto_Categoria FOREIGN KEY (Id_Categoria)
+        REFERENCES Categoria (Id_Categoria)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT CHK_Producto_precio CHECK (precio_lista >= 0),
+    CONSTRAINT CHK_Producto_porcentaje CHECK (porcentaje_liquidacion >= 0 AND porcentaje_liquidacion <= 100)
+);
+
+-- 6. TABLA: Producto_Talle
 CREATE TABLE Producto_Talle (
     Id_Producto INT NOT NULL,
     Id_Talle INT NOT NULL,
-    stock INT NOT NULL DEFAULT 0,
+    stock INT NOT NULL CONSTRAINT DF_ProductoTalle_stock DEFAULT (0),
     CONSTRAINT PK_Producto_Talle PRIMARY KEY (Id_Producto, Id_Talle),
-    CONSTRAINT CHK_Stock_NoNegativo CHECK (stock >= 0)
+    CONSTRAINT FK_ProdTalle_Producto FOREIGN KEY (Id_Producto)
+        REFERENCES Producto (Id_Producto)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT FK_ProdTalle_Talle FOREIGN KEY (Id_Talle)
+        REFERENCES Talle (Id_Talle)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT CHK_Producto_Talle_stock CHECK (stock >= 0)
 );
 
--- 5. Cliente
-CREATE TABLE Cliente (
-    Id_Cliente INT AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL,
-    apellido VARCHAR(50) NOT NULL,
-    dni VARCHAR(15) NOT NULL,
-    telefono VARCHAR(20) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    direccion VARCHAR(150) NULL,
-    CONSTRAINT PK_Cliente PRIMARY KEY (Id_Cliente)
-);
-
--- 6. Metodo_pago
-CREATE TABLE Metodo_pago (
-    Id_metodo_pago INT AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL,
-    porcentaje_descuento DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    CONSTRAINT PK_Metodo_pago PRIMARY KEY (Id_metodo_pago),
-    CONSTRAINT CHK_PorcentajeDesc_Rango CHECK (porcentaje_descuento BETWEEN 0.00 AND 100.00)
-);
-
--- 7. Venta
+-- 7. TABLA: Venta
 CREATE TABLE Venta (
-    Id_Venta INT AUTO_INCREMENT,
-    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    canal VARCHAR(20) NOT NULL,
-    descuento_aplicado DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    total DECIMAL(10,2) NOT NULL,
+    Id_Venta INT IDENTITY(1,1) NOT NULL,
+    fecha_hora DATETIME2(0) NOT NULL CONSTRAINT DF_Venta_fechahora DEFAULT (SYSDATETIME()),
+    canal VARCHAR(50) NOT NULL,
+    descuento_aplicado DECIMAL(10, 2) NOT NULL CONSTRAINT DF_Venta_descuento DEFAULT (0.00),
+    total DECIMAL(10, 2) NOT NULL CONSTRAINT DF_Venta_total DEFAULT (0.00),
     Id_Cliente INT NOT NULL,
     Id_metodo_pago INT NOT NULL,
     CONSTRAINT PK_Venta PRIMARY KEY (Id_Venta),
-    CONSTRAINT CHK_Canal_Valido CHECK (canal IN ('MOSTRADOR', 'ONLINE')),
-    CONSTRAINT CHK_Descuento_NoNegativo CHECK (descuento_aplicado >= 0),
-    CONSTRAINT CHK_Total_NoNegativo CHECK (total >= 0)
+    CONSTRAINT FK_Venta_Cliente FOREIGN KEY (Id_Cliente)
+        REFERENCES Cliente (Id_Cliente)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT FK_Venta_Metodo_pago FOREIGN KEY (Id_metodo_pago)
+        REFERENCES Metodo_pago (Id_metodo_pago)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT CHK_Venta_descuento CHECK (descuento_aplicado >= 0),
+    CONSTRAINT CHK_Venta_total CHECK (total >= 0)
 );
 
--- 8. Detalle_Venta
+-- 8. TABLA: Detalle_Venta
 CREATE TABLE Detalle_Venta (
-    nro_item INT NOT NULL,
     Id_Venta INT NOT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10,2) NOT NULL,
-    subtotal DECIMAL(10,2) NOT NULL,
+    nro_item INT NOT NULL,
     Id_Producto INT NOT NULL,
     Id_Talle INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
     CONSTRAINT PK_Detalle_Venta PRIMARY KEY (Id_Venta, nro_item),
-    CONSTRAINT CHK_Cantidad_Positiva CHECK (cantidad > 0),
-    CONSTRAINT CHK_PrecioUnitario_Positivo CHECK (precio_unitario >= 0),
-    CONSTRAINT CHK_Subtotal_Positivo CHECK (subtotal >= 0)
+    CONSTRAINT FK_DetalleVenta_Venta FOREIGN KEY (Id_Venta)
+        REFERENCES Venta (Id_Venta)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT FK_DetalleVenta_ProductoTalle FOREIGN KEY (Id_Producto, Id_Talle)
+        REFERENCES Producto_Talle (Id_Producto, Id_Talle)
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT CHK_DetalleVenta_cantidad CHECK (cantidad > 0),
+    CONSTRAINT CHK_DetalleVenta_precio CHECK (precio_unitario >= 0),
+    CONSTRAINT CHK_DetalleVenta_subtotal CHECK (subtotal >= 0)
 );
-
 ```
 
 ## 5. Restricciones de Unicidad (UNIQUE)
@@ -201,41 +229,32 @@ Impiden la duplicación de datos de negocio clave dentro del sistema.
  | ----- | ----- | ----- | 
 | **`Cliente`** | `dni` | Evitar la duplicación de cuentas o fichas de clientes. | 
 | **`Cliente`** | `email` | Garantizar emails únicos para autenticación en canal online. | 
-| **`Categoria`** | `nombre` | No permitir categorías redundantes con el mismo nombre. | 
-| **`Talle`** | `descripcion` | Evitar nombres de talles duplicados en la base de datos. | 
-| **`Metodo_pago`** | `nombre` | Prevenir duplicación en los nombres de métodos de pago. | 
 
-## 6. Restricciones Complejas y Reglas de Negocio (Triggers)
+En el esquema implementado la unicidad se aplica solo a los datos de identificación del cliente (`UQ_Cliente_dni` y `UQ_Cliente_email`). Los nombres de `Categoria`, `Talle` y `Metodo_pago` no tienen restricción `UNIQUE`: los datos de prueba no los repiten, pero la base no lo impide.
 
-Determinadas reglas del negocio no pueden resolverse únicamente mediante restricciones estáticas (CHECK) y requieren mecanismos procedimentales o triggers:
+## 6. Restricciones Complejas y Reglas de Negocio (T-SQL)
+
+Determinadas reglas del negocio no pueden resolverse únicamente con restricciones estáticas (`CHECK`). En SQL Server se resuelven con procedimientos almacenados, transacciones y triggers, que se implementan en la Etapa V (`docs/etapa-05/`):
 
 ### 6.1. Control de Stock Suficiente (RN.02)
 
-* **Regla:** No se permite efectuar una venta si la `cantidad` en `Detalle_Venta` supera el `stock` disponible en `Producto_Talle` para el producto y talle seleccionados.
+* **Regla:** No se permite efectuar una venta si la `cantidad` solicitada supera el `stock` disponible en `Producto_Talle` para el producto y talle seleccionados.
 
-* **Mecanismo:** `BEFORE INSERT ON Detalle_Venta`
+* **Mecanismo:** el procedimiento `sp_RegistrarVentaCompleta` verifica el stock con `fn_StockDisponible` antes de registrar la venta. La restricción `CHECK (stock >= 0)` impide que el stock quede negativo aunque se intente actualizar por otra vía.
 
-* **Acción:** Si `NEW.cantidad > Producto_Talle.stock`, el sistema lanza una excepción abortando la transacción (`SIGNAL SQLSTATE '45000'`).
+* **Acción:** si el stock no alcanza, se ejecuta `THROW 50001, 'Stock insuficiente', 1` y se revierte la transacción.
 
 ### 6.2. Descuento Automático de Stock (RN.02)
 
 * **Regla:** Al confirmarse un ítem de venta, el stock debe reducirse automáticamente.
 
-* **Mecanismo:** `AFTER INSERT ON Detalle_Venta`
-
-* **Acción:** Ejecuta la actualización:
-  
-
-  $$
-  \text{stock}_{\text{nuevo}} = \text{stock}_{\text{actual}} - \text{NEW.cantidad}
-  $$
+* **Mecanismo:** el mismo procedimiento actualiza `Producto_Talle` dentro de la transacción de la venta, de modo que el descuento de stock y el registro de la venta se confirman o se revierten juntos.
 
 ### 6.3. Congelamiento de Precio Unitario e Inmutabilidad (RN.08)
 
 * **Regla:** El precio asignado en `Detalle_Venta.precio_unitario` debe congelarse con el valor vigente al momento de vender y no actualizarse si cambia `Producto.precio_lista`.
 
-* **Mecanismo:** Asignación explícita mediante lógica de aplicación o trigger `BEFORE INSERT` que calcula:
-  
+* **Mecanismo:** el procedimiento calcula el precio al insertar el renglón y lo guarda en `Detalle_Venta`:
 
   $$
   \text{precio\_unitario} = \text{precio\_lista} \times (1 - \text{porcentaje\_liquidacion} / 100)
@@ -246,10 +265,11 @@ Determinadas reglas del negocio no pueden resolverse únicamente mediante restri
 | Código RN | Descripción de la Regla | Tipo de Restricción Aplicada | Ubicación en el Esquema | 
  | ----- | ----- | ----- | ----- | 
 | **RN.01** | Variantes y stock por talle / Talle único en accesorios. | PK Compuesta, NOT NULL, Registro 'Talle Único' en `Talle`. | `Producto_Talle(Id_Producto, Id_Talle)` | 
-| **RN.02** | Validación y descuento automático de stock. | `CHECK (stock >= 0)` + Trigger de control de stock. | `Producto_Talle.stock` | 
+| **RN.02** | Validación y descuento automático de stock. | `CHECK (stock >= 0)` + procedimiento de venta con control de stock. | `Producto_Talle.stock` | 
 | **RN.03** | Pertenece a una única categoría. | `FK NOT NULL` hacia `Categoria`. | `Producto.Id_Categoria` | 
 | **RN.04** | Venta siempre asociada a cliente registrado. | `FK NOT NULL` hacia `Cliente`, `UNIQUE` en DNI/Email. | `Venta.Id_Cliente`, `Cliente` | 
 | **RN.05** | Precio de lista como base. | `CHECK (precio_lista >= 0)`, `NOT NULL`. | `Producto.precio_lista` | 
 | **RN.06** | Descuento por liquidación sobre lista. | `CHECK (porcentaje_liquidacion BETWEEN 0 AND 100)`. | `Producto.porcentaje_liquidacion` | 
 | **RN.07 / RN.09** | Descuento según método de pago. | `CHECK (porcentaje_descuento BETWEEN 0 AND 100)`. | `Metodo_pago.porcentaje_descuento` | 
 | **RN.08** | Precio histórico en detalle independiente. | `CHECK (precio_unitario >= 0)` e inmutabilidad por FK RESTRICT. | `Detalle_Venta.precio_unitario` | 
+| **RN.10** | Descuento por cliente frecuente. | Regla procedimental (`fn_CalcularDescuentoCliente` en `sp_RegistrarVentaCompleta`); `CHECK (descuento_aplicado >= 0)`. | `Venta.descuento_aplicado` |

@@ -3,7 +3,7 @@
 **Tema técnico:** 2 – Manejo de transacciones
 **Scripts:** [`scripts.sql`](scripts.sql) y [`scripts_concurrencia.sql`](scripts_concurrencia.sql)
 **Evidencias:** [`evidencias/`](evidencias/)
-**Reglas de negocio:** RN.02, RN.04, RN.07, RN.08
+**Reglas de negocio:** RN.02, RN.04, RN.07, RN.08, RN.10
 
 ---
 
@@ -53,7 +53,7 @@ Las transacciones están disponibles en todas las ediciones, incluida Express.
 - **Estructura única para todas las pruebas:** `BEGIN TRAN` → pasos 1, 2 y 3 → control de stock → `COMMIT`, todo dentro de `TRY`, y el `ROLLBACK` en el `CATCH`.
 - **Descuento de stock atómico:** `UPDATE ... SET stock = stock - cantidad WHERE stock >= cantidad`, y se compara `@@ROWCOUNT` con la cantidad de renglones. Es una sola sentencia, por lo que no hay un intervalo entre "leer el stock" y "descontarlo" en el que otra venta pueda colarse. La alternativa de la guía (leer `@stock_actual`, comparar y después descontar) sí tiene ese intervalo.
 - **Total y descuento calculados antes de insertar la venta**, porque `rol_mostrador` tiene `DENY UPDATE` sobre `Venta` (ver [`seguridad.md`](../seguridad.md)) y no podría corregir el total después.
-- **Precio histórico:** el precio unitario del detalle es el de lista con la liquidación aplicada (RN.06 y RN.08), y el descuento por método de pago (RN.07) se calcula sobre el subtotal.
+- **Precio histórico:** el precio unitario del detalle es el de lista con la liquidación aplicada (RN.06 y RN.08), y el descuento (RN.07 por método de pago más RN.10 por cliente frecuente) se calcula sobre el subtotal. Con los datos de prueba ningún cliente supera los \$200.000 acumulados, por lo que el descuento por cliente frecuente es 0 % y los resultados no cambian.
 - **Varios renglones por venta:** los renglones se cargan en una variable tipo tabla, de modo que la misma lógica sirve para una venta de 1 o de N productos.
 - **Sin procedimientos almacenados:** ese tema le corresponde a otro integrante. Los bloques se pueden envolver en un procedimiento sin cambiar la lógica (ver sección 6).
 

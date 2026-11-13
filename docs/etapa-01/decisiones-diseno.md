@@ -60,12 +60,12 @@ El modelo cuenta con **8 relaciones**, dentro del rango de 6 a 10 esperado.
 ### 4.5 Método de pago como entidad
 
 - **Decisión:** `Metodo_pago` es una tabla con `nombre` y `porcentaje_descuento`, referenciada desde `Venta`.
-- **Motivo:** el descuento adicional depende del método elegido: efectivo o transferencia con descuento, tarjeta sin descuento (**RN.07** y **RN.09**). Al ser una tabla, el porcentaje se modifica sin tocar la estructura y se evita repetir texto en cada venta.
+- **Motivo:** el descuento adicional depende del método elegido: efectivo, transferencia, débito y Mercado Pago con descuento; tarjetas de crédito y gift card sin descuento (**RN.07** y **RN.09**). Al ser una tabla, el porcentaje se modifica sin tocar la estructura y se evita repetir texto en cada venta.
 - **Aplicación del descuento:** se calcula sobre el precio vigente (lista o liquidación, según corresponda), no sobre el precio de lista.
 
 ### 4.6 Canal de venta como atributo de `Venta`
 
-- **Decisión:** el canal (presencial u online) se guarda como atributo `canal` en `Venta`.
+- **Decisión:** el canal (`Local` para la venta presencial; `Web`, `Instagram` y `WhatsApp` para la venta online) se guarda como atributo `canal` en `Venta`.
 - **Motivo:** ambos canales comparten las mismas reglas y estructura, por lo que no justifican entidades separadas.
 
 ### 4.7 Datos calculados en `Venta`

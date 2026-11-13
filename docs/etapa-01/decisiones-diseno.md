@@ -18,7 +18,7 @@ Este documento registra las decisiones tomadas al definir el dominio, el alcance
 
 ## 3. Entidades del modelo
 
-El modelo cuenta con **7 relaciones**, dentro del rango de 6 a 10 esperado.
+El modelo cuenta con **8 relaciones**, dentro del rango de 6 a 10 esperado.
 
 | Entidad | Propósito | Reglas |
 |---|---|---|
@@ -38,7 +38,7 @@ El modelo cuenta con **7 relaciones**, dentro del rango de 6 a 10 esperado.
 - **Decisión:** cada registro de `Producto` representa una **variante** (por ejemplo, “Jean recto azul”). La relación N:M entre `Producto` y `Talle` se resuelve con la tabla `Producto_Talle`, cuya clave primaria es compuesta (`Id_Producto`, `Id_Talle`) y que contiene el atributo `stock`.
 - **Motivo:** una misma variante tiene varios talles, cada uno con stock propio e independiente (**RN.01**). Guardar el stock en `Producto` violaría la atomicidad y no permitiría controlar la disponibilidad por talle (**RN.02**).
 - **Accesorios:** los productos que no requieren talle se asocian a un talle único genérico, evitando una excepción en el modelo.
-- **Alternativa descartada:** una tabla aparte para "modelo" y otra para "variante" agregaría una relación más sin necesidad. Con las 7 relaciones actuales el dominio queda cubierto.
+- **Alternativa descartada:** una tabla aparte para "modelo" y otra para "variante" agregaría una relación más sin necesidad. Con las 8 relaciones actuales el dominio queda cubierto.
 
 ### 4.2 Categoría como entidad separada
 

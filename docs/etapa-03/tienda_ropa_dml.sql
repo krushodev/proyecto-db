@@ -74,7 +74,7 @@ INSERT INTO Producto (nombre, descripcion, precio_lista, en_liquidacion, porcent
 ('Cinturón de Cuero',          'Cinturón de cuero vacuno con hebilla metálica',       18000.00, 1, 25.00, 8);  -- 10
 
 -- =====================================================================
--- 6. Producto_Talle (28 registros) -> sin IDENTITY, PK compuesta
+-- 6. Producto_Talle (24 registros) -> sin IDENTITY, PK compuesta
 --    Jeans/shorts en talles numéricos, prendas de arriba en letras,
 --    accesorios en talle único.
 -- =====================================================================

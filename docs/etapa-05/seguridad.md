@@ -73,12 +73,13 @@ El DNI queda visible porque el comprobante de venta lo muestra (CU-01).
 
 ## 8. Integración con los demás temas
 
-Cuando estén los procedimientos de venta y los triggers de auditoría:
+Con los procedimientos de venta y los triggers de auditoría ya implementados:
 
-1. Dar permiso de ejecución y quitar los permisos directos:
+1. **Permiso de ejecución (ya incluido en `seguridad.sql`, sección 4.h).** `rol_mostrador` puede ejecutar `sp_RegistrarVentaCompleta` y `sp_ActualizarStock`, y usar el tipo de tabla `tt_DetalleVenta` que recibe el primero. El administrador lo hereda. Los permisos se otorgan solo si los procedimientos ya existen; si `seguridad.sql` se ejecutó antes, hay que volver a correr esa sección.
+
+   Para reforzar el control, se pueden quitar los permisos directos sobre las tablas. No se hizo en `seguridad.sql` porque las pruebas de `seguridad_pruebas.sql` registran una venta con `INSERT` directo:
 
    ```sql
-   GRANT EXECUTE ON <procedimiento_de_venta> TO rol_mostrador;
    REVOKE INSERT ON Venta FROM rol_mostrador;
    REVOKE INSERT ON Detalle_Venta FROM rol_mostrador;
    REVOKE UPDATE ON Producto_Talle (stock) FROM rol_mostrador;

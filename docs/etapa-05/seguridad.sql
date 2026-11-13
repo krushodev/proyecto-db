@@ -88,6 +88,24 @@ GRANT UNMASK TO rol_administrador;
 GO
 
 -- ---------------------------------------------------------------------
+-- 4.h Permiso de ejecucion sobre los procedimientos de venta y stock
+--     Etapa V, tema "procedimientos y funciones". Se otorga solo si los
+--     objetos ya existen (procedimientos_funciones/scripts.sql), asi este
+--     script se puede correr antes o despues. Si se ejecuta primero,
+--     volver a correr esta seccion cuando los procedimientos esten creados.
+--     rol_administrador hereda estos permisos de rol_mostrador.
+-- ---------------------------------------------------------------------
+IF OBJECT_ID(N'dbo.sp_RegistrarVentaCompleta', N'P') IS NOT NULL
+    EXEC (N'GRANT EXECUTE ON dbo.sp_RegistrarVentaCompleta TO rol_mostrador;');
+IF OBJECT_ID(N'dbo.sp_ActualizarStock', N'P') IS NOT NULL
+    EXEC (N'GRANT EXECUTE ON dbo.sp_ActualizarStock TO rol_mostrador;');
+-- El procedimiento de venta recibe una tabla como parametro: para poder
+-- pasarla hay que tener permiso de uso sobre el tipo de tabla.
+IF TYPE_ID(N'dbo.tt_DetalleVenta') IS NOT NULL
+    EXEC (N'GRANT EXECUTE ON TYPE::dbo.tt_DetalleVenta TO rol_mostrador;');
+GO
+
+-- ---------------------------------------------------------------------
 -- 4.f Usuarios de prueba, sin login
 --     No tienen contrasena ni pueden conectarse: solo sirven para probar
 --     los permisos con EXECUTE AS (ver seguridad_pruebas.sql).

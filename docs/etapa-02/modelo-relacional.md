@@ -66,7 +66,7 @@ A continuación se presenta la especificación formal del **Modelo Relacional** 
 | Columna | Tipo | Restricciones | Descripción |
 | :--- | :--- | :--- | :--- |
 | `Id_metodo_pago` | `INT` | **PK**, Auto Increment | Identificador único del medio de pago |
-| `nombre` | `VARCHAR(50)` | NOT NULL | Nombre (Efectivo, Débito, Transferencia, etc.) |
+| `nombre` | `VARCHAR(80)` | NOT NULL | Nombre (Efectivo, Transferencia bancaria, Tarjeta de débito, Mercado Pago, etc.) |
 | `porcentaje_descuento` | `DECIMAL(5,2)` | NOT NULL, Default 0.00 | Descuento bonificado según medio |
 
 ---
@@ -75,8 +75,8 @@ A continuación se presenta la especificación formal del **Modelo Relacional** 
 | Columna | Tipo | Restricciones | Descripción |
 | :--- | :--- | :--- | :--- |
 | `Id_Venta` | `INT` | **PK**, Auto Increment | Identificador único de la transacción |
-| `fecha_hora` | `DATETIME` | NOT NULL | Fecha y hora de la venta |
-| `canal` | `VARCHAR(30)` | NOT NULL | Canal (`Mostrador` / `Online`) |
+| `fecha_hora` | `DATETIME2(0)` | NOT NULL, Default `SYSDATETIME()` | Fecha y hora de la venta |
+| `canal` | `VARCHAR(50)` | NOT NULL | Canal (`Local`, `Web`, `Instagram` o `WhatsApp`) |
 | `descuento_aplicado` | `DECIMAL(10,2)` | NOT NULL, Default 0.00 | Monto descontado por pago/promoción |
 | `total` | `DECIMAL(10,2)` | NOT NULL | Importe final de la transacción |
 | `Id_Cliente` | `INT` | **FK** | Referencia a `Cliente(Id_Cliente)` |

@@ -21,6 +21,8 @@ GO
 --    controla @@ROWCOUNT. Es una sola sentencia atomica: dos ventas
 --    simultaneas no pueden dejar el stock negativo (ver
 --    scripts_concurrencia.sql).
+--  * El descuento suma el del metodo de pago (RN.07) y el de cliente
+--    frecuente (RN.10), igual que sp_RegistrarVentaCompleta.
 --  * El total y el descuento se calculan ANTES de insertar la venta,
 --    porque rol_mostrador tiene DENY UPDATE sobre Venta (seguridad.sql).
 --
@@ -64,9 +66,18 @@ BEGIN TRY
     CROSS APPLY (SELECT CAST(ROUND(p.precio_lista * (1 - CASE WHEN p.en_liquidacion = 1
                        THEN p.porcentaje_liquidacion ELSE 0 END / 100.0), 2) AS DECIMAL(10,2)) AS precio) pu;
 
-    -- Descuento por metodo de pago (RN.07).
-    SELECT @descuento = CAST(ROUND(@subtotal * mp.porcentaje_descuento / 100.0, 2) AS DECIMAL(10,2))
-    FROM Metodo_pago mp WHERE mp.Id_metodo_pago = @id_metodo;
+    -- Descuento por metodo de pago (RN.07)
+    -- Mas el descuento por cliente frecuente (RN.10): 5 % si sus compras
+    -- anteriores superan 200000 y 10 % si superan 500000 (tope total 100 %).
+    SELECT @descuento = CAST(ROUND(@subtotal *
+               CASE WHEN mp.porcentaje_descuento + h.pct > 100 THEN 100
+                    ELSE mp.porcentaje_descuento + h.pct END / 100.0, 2) AS DECIMAL(10,2))
+    FROM Metodo_pago mp
+    CROSS APPLY (SELECT CASE WHEN g.gastado > 500000 THEN 10.0
+                             WHEN g.gastado > 200000 THEN 5.0 ELSE 0.0 END AS pct
+                 FROM (SELECT ISNULL(SUM(total), 0) AS gastado
+                       FROM Venta WHERE Id_Cliente = @id_cliente) g) h
+    WHERE mp.Id_metodo_pago = @id_metodo;
 
     -- Paso 1: encabezado
     INSERT INTO Venta (canal, descuento_aplicado, total, Id_Cliente, Id_metodo_pago)
@@ -141,8 +152,17 @@ BEGIN TRY
     CROSS APPLY (SELECT CAST(ROUND(p.precio_lista * (1 - CASE WHEN p.en_liquidacion = 1
                        THEN p.porcentaje_liquidacion ELSE 0 END / 100.0), 2) AS DECIMAL(10,2)) AS precio) pu;
 
-    SELECT @descuento = CAST(ROUND(@subtotal * mp.porcentaje_descuento / 100.0, 2) AS DECIMAL(10,2))
-    FROM Metodo_pago mp WHERE mp.Id_metodo_pago = @id_metodo;
+    -- Mas el descuento por cliente frecuente (RN.10): 5 % si sus compras
+    -- anteriores superan 200000 y 10 % si superan 500000 (tope total 100 %).
+    SELECT @descuento = CAST(ROUND(@subtotal *
+               CASE WHEN mp.porcentaje_descuento + h.pct > 100 THEN 100
+                    ELSE mp.porcentaje_descuento + h.pct END / 100.0, 2) AS DECIMAL(10,2))
+    FROM Metodo_pago mp
+    CROSS APPLY (SELECT CASE WHEN g.gastado > 500000 THEN 10.0
+                             WHEN g.gastado > 200000 THEN 5.0 ELSE 0.0 END AS pct
+                 FROM (SELECT ISNULL(SUM(total), 0) AS gastado
+                       FROM Venta WHERE Id_Cliente = @id_cliente) g) h
+    WHERE mp.Id_metodo_pago = @id_metodo;
 
     INSERT INTO Venta (canal, descuento_aplicado, total, Id_Cliente, Id_metodo_pago)
     VALUES (@canal, @descuento, @subtotal - @descuento, @id_cliente, @id_metodo);
@@ -214,8 +234,17 @@ BEGIN TRY
     CROSS APPLY (SELECT CAST(ROUND(p.precio_lista * (1 - CASE WHEN p.en_liquidacion = 1
                        THEN p.porcentaje_liquidacion ELSE 0 END / 100.0), 2) AS DECIMAL(10,2)) AS precio) pu;
 
-    SELECT @descuento = CAST(ROUND(@subtotal * mp.porcentaje_descuento / 100.0, 2) AS DECIMAL(10,2))
-    FROM Metodo_pago mp WHERE mp.Id_metodo_pago = @id_metodo;
+    -- Mas el descuento por cliente frecuente (RN.10): 5 % si sus compras
+    -- anteriores superan 200000 y 10 % si superan 500000 (tope total 100 %).
+    SELECT @descuento = CAST(ROUND(@subtotal *
+               CASE WHEN mp.porcentaje_descuento + h.pct > 100 THEN 100
+                    ELSE mp.porcentaje_descuento + h.pct END / 100.0, 2) AS DECIMAL(10,2))
+    FROM Metodo_pago mp
+    CROSS APPLY (SELECT CASE WHEN g.gastado > 500000 THEN 10.0
+                             WHEN g.gastado > 200000 THEN 5.0 ELSE 0.0 END AS pct
+                 FROM (SELECT ISNULL(SUM(total), 0) AS gastado
+                       FROM Venta WHERE Id_Cliente = @id_cliente) g) h
+    WHERE mp.Id_metodo_pago = @id_metodo;
 
     INSERT INTO Venta (canal, descuento_aplicado, total, Id_Cliente, Id_metodo_pago)
     VALUES (@canal, @descuento, @subtotal - @descuento, @id_cliente, @id_metodo);
@@ -288,8 +317,17 @@ BEGIN TRY
     CROSS APPLY (SELECT CAST(ROUND(p.precio_lista * (1 - CASE WHEN p.en_liquidacion = 1
                        THEN p.porcentaje_liquidacion ELSE 0 END / 100.0), 2) AS DECIMAL(10,2)) AS precio) pu;
 
-    SELECT @descuento = CAST(ROUND(@subtotal * mp.porcentaje_descuento / 100.0, 2) AS DECIMAL(10,2))
-    FROM Metodo_pago mp WHERE mp.Id_metodo_pago = @id_metodo;
+    -- Mas el descuento por cliente frecuente (RN.10): 5 % si sus compras
+    -- anteriores superan 200000 y 10 % si superan 500000 (tope total 100 %).
+    SELECT @descuento = CAST(ROUND(@subtotal *
+               CASE WHEN mp.porcentaje_descuento + h.pct > 100 THEN 100
+                    ELSE mp.porcentaje_descuento + h.pct END / 100.0, 2) AS DECIMAL(10,2))
+    FROM Metodo_pago mp
+    CROSS APPLY (SELECT CASE WHEN g.gastado > 500000 THEN 10.0
+                             WHEN g.gastado > 200000 THEN 5.0 ELSE 0.0 END AS pct
+                 FROM (SELECT ISNULL(SUM(total), 0) AS gastado
+                       FROM Venta WHERE Id_Cliente = @id_cliente) g) h
+    WHERE mp.Id_metodo_pago = @id_metodo;
 
     INSERT INTO Venta (canal, descuento_aplicado, total, Id_Cliente, Id_metodo_pago)
     VALUES (@canal, @descuento, @subtotal - @descuento, @id_cliente, @id_metodo);

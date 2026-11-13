@@ -56,11 +56,13 @@ Se incluyó el atributo **`precio_unitario`** dentro de la entidad **`Detalle_Ve
 
 #### Planteo del problema
 
-El cálculo del monto final de una compra involucra dos niveles de descuentos:
+El cálculo del monto final de una compra involucra tres niveles de descuentos:
 
 1. **Nivel de Producto:** Liquidación sobre el precio de lista base (RN.05, RN.06).
 
-2. **Nivel de Transacción:** Descuento adicional por medio de pago seleccionado (Efectivo/Transferencia vs. Tarjeta) (RN.07, RN.09).
+2. **Nivel de Transacción:** Descuento adicional por medio de pago seleccionado (RN.07, RN.09).
+
+3. **Nivel de Cliente:** Descuento adicional para clientes frecuentes según su gasto acumulado (RN.10).
 
 #### Decisión adoptada
 
@@ -68,11 +70,15 @@ El cálculo del monto final de una compra involucra dos niveles de descuentos:
 
 * **En `Metodo_pago`:** Se añadió el atributo `porcentaje_descuento`. Ejemplos de datos maestrizados:
 
-  * Efectivo $\rightarrow 10\%$
+  * Efectivo $\rightarrow 15\%$
 
   * Transferencia $\rightarrow 10\%$
 
-  * Tarjeta de Crédito/Débito $\rightarrow 0\%$
+  * Tarjeta de Débito $\rightarrow 5\%$
+
+  * Mercado Pago $\rightarrow 5\%$
+
+  * Tarjeta de Crédito (1 pago, 3 y 6 cuotas) y Gift card $\rightarrow 0\%$
 
 * **En `Venta`:** Se incluyen los atributos consolidados `descuento_aplicado` y `total`. Almacenar el total final calculado al cierre de la venta agiliza la generación de reportes comerciales y previene diferencias por cálculo de decimales.
 
@@ -86,7 +92,7 @@ La tienda opera bajo dos modalidades: venta presencial en mostrador y catálogo 
 
 * **Tabla Única de `Cliente`:** Se utiliza una sola entidad `Cliente` para registrar a los compradores tanto presenciales como virtuales. Si es un comprador presencial por primera vez, se registran sus datos mínimos obligatorios (nombre, apellido, DNI, teléfono/email) al momento del cobro.
 
-* **Atributo `canal` en `Venta`:** En lugar de crear tablas de ventas separadas (`Venta_Online` y `Venta_Mostrador`), se utiliza un único encabezado de venta con un atributo enumerado `canal` (valores: `'MOSTRADOR'`, `'ONLINE'`).
+* **Atributo `canal` en `Venta`:** En lugar de crear tablas de ventas separadas (`Venta_Online` y `Venta_Mostrador`), se utiliza un único encabezado de venta con un atributo enumerado `canal` (valores: `'Local'` para la venta presencial; `'Web'`, `'Instagram'` y `'WhatsApp'` para la venta online).
 
 * **Justificación:** Centraliza la facturación y la historia de compra del cliente en un solo lugar, simplificando análisis de comportamiento de compra *omnichannel*.
 

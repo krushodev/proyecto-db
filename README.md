@@ -26,7 +26,7 @@ La tienda necesita centralizar su operatoria diaria:
 - **Catálogo:** productos organizados por categoría, variante y talle, con stock propio por talle. Los accesorios usan un talle único genérico.
 - **Clientes:** toda venta queda asociada a un cliente registrado, sin importar el canal.
 - **Ventas:** se registra el precio unitario histórico de cada ítem, de modo que los cambios de precio en el catálogo no afectan las ventas ya realizadas.
-- **Precios:** precio de lista, descuento por liquidación y descuento adicional según el método de pago (efectivo y transferencia sí, tarjeta no).
+- **Precios:** precio de lista, descuento por liquidación y descuento adicional según el método de pago y descuento por cliente frecuente.
 
 **Fuera del alcance:** proveedores y compras de mercadería, logística de envíos, facturación electrónica e integración con pasarelas de pago.
 
@@ -86,9 +86,24 @@ docs/
 │   ├── consulta_avanzada.sql      # CU-03: clientes de mayor valor
 │   └── consulta-avanzada.md
 └── etapa-05/                      # Temas técnicos
+    ├── procedimientos_funciones/  # Procedimientos y funciones almacenadas
+    │   ├── investigacion.md
+    │   ├── scripts.sql
+    │   └── evidencias/
+    ├── transacciones/             # Transacciones y concurrencia
+    │   ├── investigacion.md
+    │   ├── scripts.sql
+    │   ├── scripts_concurrencia.sql
+    │   └── evidencias/
+    ├── triggers_auditoria/        # Triggers de auditoría
+    │   ├── investigacion.md
+    │   ├── scripts.sql
+    │   └── evidencias/
     ├── seguridad.sql              # Roles, permisos y enmascaramiento
     ├── seguridad_pruebas.sql      # Pruebas de permisos
-    └── seguridad.md
+    ├── seguridad.md
+    ├── optimizacion_consultas.sql # Optimización de consultas
+    └── optimizacion_consultas.md
 ```
 
 ---
@@ -152,8 +167,8 @@ Aplica el principio de mínimo privilegio con roles basados en los actores de lo
 | **I** | Descripción del caso, alcance, reglas de negocio y decisiones de diseño | ✅ |
 | **II** | DER, modelo relacional y normalización hasta 3FN | ✅ |
 | **III** | Scripts DDL y DML, restricciones de integridad y pruebas de validación | ✅ |
-| **IV** | Casos de uso, comprobante de venta, reporte agregado por categoría y consulta de negocio avanzada | ⏳ |
-| **V** | Procedimientos y funciones, transacciones, triggers de auditoría, seguridad y optimización de consultas | ⏳ |
+| **IV** | Casos de uso, comprobante de venta, reporte agregado por categoría y consulta de negocio avanzada | ✅ |
+| **V** | Procedimientos y funciones, transacciones, triggers de auditoría, seguridad y optimización de consultas | ✅ |
 
 ---
 
@@ -167,8 +182,9 @@ Aplica el principio de mínimo privilegio con roles basados en los actores de lo
 | **RN.04** | Toda venta se asocia a un cliente registrado. |
 | **RN.05** | Cada producto tiene un precio de lista. |
 | **RN.06** | Los productos en liquidación tienen un descuento sobre el precio de lista. |
-| **RN.07** | Pagando en efectivo o transferencia se aplica un descuento adicional sobre el precio vigente. |
+| **RN.07** | Se aplica un descuento adicional sobre el precio vigente según el método de pago (efectivo, transferencia, débito y Mercado Pago sí; crédito y gift card no). |
 | **RN.08** | El precio unitario se registra en el detalle al momento de la venta. |
-| **RN.09** | Métodos de pago admitidos: efectivo, transferencia y tarjeta. |
+| **RN.09** | Métodos de pago admitidos: efectivo, transferencia, tarjeta de débito, tarjeta de crédito, Mercado Pago y gift card. |
+| **RN.10** | Los clientes frecuentes reciben un descuento adicional según su gasto acumulado (5 % sobre \$200.000 y 10 % sobre \$500.000). |
 
 El detalle completo está en [`docs/etapa-01/reglas-negocio.md`](docs/etapa-01/reglas-negocio.md).

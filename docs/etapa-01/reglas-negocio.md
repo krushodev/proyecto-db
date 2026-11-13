@@ -23,7 +23,8 @@
 
 - **RN.05** — Cada producto tiene un precio de lista, que es el precio base de referencia.
 - **RN.06** — Si el producto está en liquidación, se aplica un descuento sobre el precio de lista, obteniendo un precio de liquidación.
-- **RN.07** — Sobre el precio vigente (de lista o de liquidación, según corresponda), se aplica un descuento adicional si el método de pago elegido es efectivo o transferencia. Con tarjeta no se aplica este descuento adicional.
+- **RN.07** — Sobre el precio vigente (de lista o de liquidación, según corresponda), se aplica un descuento adicional cuyo porcentaje depende del método de pago elegido (efectivo, transferencia, tarjeta de débito y Mercado Pago tienen descuento; las tarjetas de crédito y la gift card no).
+- **RN.10** — Los clientes frecuentes reciben un descuento adicional según el total de sus compras anteriores: 5 % si superan \$200.000 y 10 % si superan \$500.000. Este descuento se suma al de RN.07 (con un tope del 100 %) y se aplica sobre el precio vigente.
 
 ---
 
@@ -35,4 +36,4 @@
 
 ## Métodos de pago
 
-- **RN.09** — La venta admite como método de pago efectivo, transferencia o tarjeta. El método seleccionado determina si corresponde el descuento adicional descripto en RN.07.
+- **RN.09** — La venta admite como método de pago efectivo, transferencia bancaria, tarjeta de débito, tarjeta de crédito (1 pago, 3 o 6 cuotas), Mercado Pago o gift card. El método seleccionado determina el porcentaje de descuento adicional descripto en RN.07.

@@ -99,9 +99,11 @@ docs/
     │   ├── investigacion.md
     │   ├── scripts.sql
     │   └── evidencias/
-    ├── seguridad.sql              # Roles, permisos y enmascaramiento
-    ├── seguridad_pruebas.sql      # Pruebas de permisos
-    ├── seguridad.md
+    ├── seguridad/                 # Seguridad: usuarios, roles y permisos
+    │   ├── seguridad.md
+    │   ├── seguridad.sql          # Roles, permisos y enmascaramiento
+    │   ├── seguridad_pruebas.sql  # Pruebas de permisos
+    │   └── seguridad_guia.sql     # Demostración de la guía (logins, usuario vs. rol)
     ├── optimizacion_indices/      # Optimización de consultas a través de índices
     │   ├── investigacion.md
     │   ├── scripts.sql
@@ -120,7 +122,7 @@ docs/
 2. Ejecutar [`docs/etapa-03/tienda_ropa_dml.sql`](docs/etapa-03/tienda_ropa_dml.sql). Carga los datos de prueba.
 3. Opcional: correr las consultas de [`pruebas-validacion.md`](docs/etapa-03/pruebas-validacion.md) para verificar la carga, la integridad y las restricciones.
 4. Ejecutar las consultas de la Etapa IV (ver [Consultas](#consultas-etapa-iv)). Cada una se corre por separado, después de cargar los datos de prueba.
-5. Ejecutar [`docs/etapa-05/seguridad.sql`](docs/etapa-05/seguridad.sql) y después [`docs/etapa-05/seguridad_pruebas.sql`](docs/etapa-05/seguridad_pruebas.sql). Crean los roles y permisos, y verifican que funcionen.
+5. Ejecutar [`docs/etapa-05/seguridad/seguridad.sql`](docs/etapa-05/seguridad/seguridad.sql) y después [`docs/etapa-05/seguridad/seguridad_pruebas.sql`](docs/etapa-05/seguridad/seguridad_pruebas.sql). Crean los roles y permisos, y verifican que funcionen. Con los procedimientos de [`procedimientos_funciones/scripts.sql`](docs/etapa-05/procedimientos_funciones/scripts.sql) ya creados, ejecutar [`seguridad_guia.sql`](docs/etapa-05/seguridad/seguridad_guia.sql) para la demostración de la guía.
 6. Ejecutar [`docs/etapa-05/optimizacion_indices/scripts.sql`](docs/etapa-05/optimizacion_indices/scripts.sql) en SSMS con el plan de ejecución real activado (Ctrl+M). Crea la tabla de pruebas `VentaHistorica` (1.200.000 filas) y mide la consulta sin índice, con índice agrupado y con índice no agrupado de cobertura. Resultados en [`investigacion.md`](docs/etapa-05/optimizacion_indices/investigacion.md).
 
 > Los scripts de la Etapa III no son re-ejecutables sobre una base ya creada o poblada. Para volver a correrlos, eliminar antes las tablas o la base `tienda_ropa`. `seguridad.sql` sí se puede volver a ejecutar.
@@ -156,7 +158,7 @@ Las necesidades de información de la etapa se modelan como casos de uso en [`ca
 
 ## Seguridad (Etapa V)
 
-Aplica el principio de mínimo privilegio con roles basados en los actores de los casos de uso. El detalle y los resultados de las pruebas están en [`seguridad.md`](docs/etapa-05/seguridad.md).
+Aplica el principio de mínimo privilegio con roles basados en los actores de los casos de uso. El detalle y los resultados de las pruebas están en [`seguridad.md`](docs/etapa-05/seguridad/seguridad.md).
 
 | Rol | Puede | No puede |
 | :--- | :--- | :--- |

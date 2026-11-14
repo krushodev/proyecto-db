@@ -1,7 +1,7 @@
 # Seguridad – Etapa V – Intensa Jeans
 
 **Tema técnico:** 4 – Seguridad
-**Scripts:** [`seguridad.sql`](seguridad.sql) y [`seguridad_pruebas.sql`](seguridad_pruebas.sql)
+**Scripts:** [`seguridad.sql`](seguridad.sql), [`seguridad_pruebas.sql`](seguridad_pruebas.sql) y [`seguridad_guia.sql`](seguridad_guia.sql)
 **Reglas de negocio:** RN.02, RN.04, RN.08
 
 ---
@@ -21,7 +21,7 @@ Hasta la etapa IV, cualquier usuario conectado a la base podía hacer lo mismo q
 
 ## 3. Roles
 
-Los roles salen de los actores definidos en [`casos-uso.md`](../etapa-04/casos-uso.md). `rol_administrador` es miembro de `rol_mostrador`, lo que implementa la generalización entre ambos actores: el administrador hereda todo lo que puede hacer el mostrador.
+Los roles salen de los actores definidos en [`casos-uso.md`](../../etapa-04/casos-uso.md). `rol_administrador` es miembro de `rol_mostrador`, lo que implementa la generalización entre ambos actores: el administrador hereda todo lo que puede hacer el mostrador.
 
 | Rol | Actor | Función |
 | :--- | :--- | :--- |
@@ -94,7 +94,38 @@ Las tablas nuevas no heredan permisos: cada una necesita sus propios `GRANT`.
 ## 9. Cómo probar
 
 1. Ejecutar `docs/etapa-03/ecommerce.sql` y `docs/etapa-03/tienda_ropa_dml.sql`.
-2. Ejecutar `seguridad.sql`. Se puede volver a correr sin errores.
-3. Ejecutar `seguridad_pruebas.sql` y verificar que todas las filas tengan `ok = 'SI'`.
+2. Ejecutar `docs/etapa-05/procedimientos_funciones/scripts.sql`.
+3. Ejecutar `seguridad.sql`. Se puede volver a correr sin errores.
+4. Ejecutar `seguridad_pruebas.sql` y verificar que todas las filas tengan `ok = 'SI'`.
+5. Ejecutar `seguridad_guia.sql` y verificar que las 5 filas tengan `ok = 'SI'` (sección 10).
 
 Para crear un usuario real con contraseña, usar la plantilla de la sección 4.g de `seguridad.sql`.
+
+## 10. Demostración de la guía de la etapa V
+
+La guía pide cuatro demostraciones puntuales. [`seguridad_guia.sql`](seguridad_guia.sql) las implementa con **usuarios nuevos**, sin tocar `rol_mostrador` ni `rol_administrador`, para que las 24 pruebas de la sección 6 sigan valiendo.
+
+| Demostración | Cómo se implementa |
+| :--- | :--- |
+| Usuarios con inicio de sesión | `CREATE LOGIN ... WITH PASSWORD` y `CREATE USER ... FOR LOGIN` para `usuario_admin`, `usuario_lector`, `usuario_con_rol` y `usuario_sin_rol`. |
+| Permisos dados directamente a un usuario | `usuario_lector` recibe `GRANT SELECT ON Venta` sin pasar por ningún rol. |
+| `INSERT` directo frente a procedimiento | `usuario_lector` no tiene `INSERT` sobre ninguna tabla, pero tiene `GRANT EXECUTE` sobre `sp_RegistrarVentaCompleta` y sobre el tipo `tt_DetalleVenta`. |
+| Permisos dados a través de un rol | `rol_consulta_productos` tiene `SELECT` sobre `Producto`. `usuario_con_rol` es miembro; `usuario_sin_rol` no. |
+
+**Resultado esperado:**
+
+| Prueba | Usuario | Resultado esperado |
+| :--- | :--- | :--- |
+| `SELECT` sobre `Producto` | `usuario_con_rol` | Correcto |
+| `SELECT` sobre `Producto` | `usuario_sin_rol` | Acceso denegado |
+| `INSERT` directo sobre `Venta` | `usuario_admin` | Correcto |
+| `INSERT` directo sobre `Venta` | `usuario_lector` | Acceso denegado |
+| `EXEC` del procedimiento | `usuario_lector` | Correcto |
+
+**Por qué el lector puede registrar la venta con el procedimiento.** El procedimiento y las tablas que modifica (`Venta`, `Detalle_Venta`, `Producto_Talle`) tienen el mismo dueño, `dbo`. Por el encadenamiento de propiedad (*ownership chaining*), SQL Server controla solo el permiso `EXECUTE` sobre el procedimiento y no vuelve a controlar los permisos sobre esas tablas. Así el usuario no puede escribir en la tabla directamente, pero sí puede hacer la operación autorizada, con las validaciones y reglas del procedimiento.
+
+Decisiones respecto de la guía:
+
+- **Administrador.** La guía agrega `usuario_admin` a `db_owner`. Acá se lo agrega a `rol_administrador`, que es más restrictivo: no puede modificar la estructura ni el historial de ventas. Alcanza para la prueba del `INSERT` directo y respeta el mínimo privilegio.
+- **Contraseñas.** Son de ejemplo, porque quedan guardadas en el repositorio. No se deben usar en un servidor real.
+- **Ejecución de las pruebas.** Igual que `seguridad_pruebas.sql`, se usa `EXECUTE AS USER` y cada operación se revierte. Para conectarse de verdad con estos logins, el servidor necesita autenticación mixta.

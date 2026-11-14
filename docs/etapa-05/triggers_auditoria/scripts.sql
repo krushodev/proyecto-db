@@ -132,11 +132,22 @@ GO
 
 -- =====================================================================
 -- 4. PRUEBAS
---    Cada prueba corre dentro de una transaccion que se deshace al final
---    (ROLLBACK), asi la base de datos queda como estaba y las pruebas se
---    pueden repetir. Cada una muestra solo las filas de Auditoria que
---    genero (Id_Auditoria > @ultimo).
+--    Las pruebas 1 a 8 corren dentro de una transaccion que se deshace
+--    al final (ROLLBACK), asi la base de datos queda como estaba y las
+--    pruebas se pueden repetir. Cada una muestra solo las filas de
+--    Auditoria que genero (Id_Auditoria > @ultimo).
+--    La prueba 9 compara la cantidad de filas de Auditoria antes y
+--    despues de las pruebas.
 -- =====================================================================
+
+-- Punto de partida para la prueba 9. Auditoria puede tener registros
+-- previos (por ejemplo, la demo de investigacion.md o la prueba 1 de
+-- transacciones, que confirman sus cambios). Se usa una tabla temporal
+-- porque las variables no sobreviven a los GO entre pruebas.
+IF OBJECT_ID('tempdb..#auditoria_inicio') IS NOT NULL
+    DROP TABLE #auditoria_inicio;
+SELECT COUNT(*) AS filas INTO #auditoria_inicio FROM Auditoria;
+GO
 
 -- ---------------------------------------------------------------------
 -- Prueba 1 (exito): cambio de precio de lista.
@@ -250,8 +261,17 @@ ROLLBACK;
 GO
 
 -- ---------------------------------------------------------------------
--- Prueba 9 (verificacion): despues de las pruebas la auditoria no
--- conserva registros, porque cada una se deshizo con ROLLBACK.
+-- Prueba 9 (verificacion): las pruebas no dejan registros en Auditoria,
+-- porque cada una se deshizo con ROLLBACK.
+-- Esperado: filas_despues = filas_antes, resultado = 'OK'
+-- (0 y 0 con la base recien cargada).
 -- ---------------------------------------------------------------------
-SELECT 'P9' AS prueba, COUNT(*) AS filas_en_auditoria FROM Auditoria;
+SELECT 'P9' AS prueba,
+       i.filas  AS filas_antes,
+       a.filas  AS filas_despues,
+       CASE WHEN a.filas = i.filas THEN 'OK' ELSE 'REVISAR' END AS resultado
+FROM #auditoria_inicio i
+CROSS JOIN (SELECT COUNT(*) AS filas FROM Auditoria) a;
+
+DROP TABLE #auditoria_inicio;
 GO

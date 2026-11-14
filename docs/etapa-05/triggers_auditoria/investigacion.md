@@ -130,7 +130,7 @@ ORDER BY a.Id_Auditoria DESC;
 
 ### 5.2. Pruebas del script
 
-`scripts.sql` incluye 9 pruebas. Cada una corre dentro de una transacción que se deshace con `ROLLBACK`, así la base queda como estaba.
+`scripts.sql` incluye 9 pruebas. Las pruebas 1 a 8 corren dentro de una transacción que se deshace con `ROLLBACK`, así la base queda como estaba. La prueba 9 lo verifica: compara la cantidad de filas de `Auditoria` antes y después de las pruebas.
 
 | Prueba | Tipo | Caso | Resultado obtenido | Evidencia |
 | :-: | :-: | :--- | :--- | :--- |
@@ -142,7 +142,7 @@ ORDER BY a.Id_Auditoria DESC;
 | P6 | Éxito | Alta y baja de un producto | 2 filas (`INSERT` y `DELETE`) | [`07_p6_insert_delete.png`](evidencias/07_p6_insert_delete.png) |
 | P7 | Error | Stock negativo | El `CHECK` lo rechaza; 0 filas en `Auditoria` | [`08_p7_stock_negativo.png`](evidencias/08_p7_stock_negativo.png) |
 | P8 | Error | Borrar un producto con stock asociado | La clave foránea lo rechaza; 0 filas en `Auditoria` | [`09_p8_fk.png`](evidencias/09_p8_fk.png) |
-| P9 | Verificación | Estado final de `Auditoria` | 0 filas (todo se deshizo) | [`09b_p9_verificacion.png`](evidencias/09b_p9_verificacion.png) |
+| P9 | Verificación | Filas de `Auditoria` antes y después de las pruebas | Misma cantidad, resultado `OK` (0 y 0 con la base recién cargada) | [`09b_p9_verificacion.png`](evidencias/09b_p9_verificacion.png) |
 
 ### 5.3. Evidencia de la creación de los objetos
 

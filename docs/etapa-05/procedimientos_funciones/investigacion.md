@@ -188,4 +188,19 @@ Capturas tomadas en SQL Server Management Studio al ejecutar `scripts.sql`, guar
 
 > Una vez tomadas las capturas, se enlazan con `![descripción](evidencias/archivo.png)`.
 
-**Resultado obtenido:** *completar tras ejecutar el script en SQL Server Management Studio.*
+**Resultado obtenido:** el script se ejecutó en SQL Server Management Studio el 13/11/2026 sobre la base cargada con `ecommerce.sql` y `tienda_ropa_dml.sql`. Los resultados coincidieron con los esperados:
+
+| Prueba | Resultado obtenido |
+| :-: | :--- |
+| 1 | Stock (1,1) = 12; combinación inexistente = 0; descuento 0 % para todos los clientes |
+| 2 | 200000.00 → 0 %; 200000.01 → 5 %; 500000.00 → 5 %; 500000.01 → 10 % |
+| 3 | Venta 1 renglón: descuento 4500.00, total 25500.00; stock (6,7) 25 → 23 |
+| 4 | Venta 2 renglones: descuento 9090.00, total 51510.00; stock 8 → 7 y 30 → 28 |
+| 5 | Primera venta: total 195500.00 y stock 0; la segunda quedó rechazada sin dejar rastros (11 ventas dentro de la prueba, stock 0) |
+| 12 | Ingreso de 20 unidades: stock 12 → 32 |
+| 13 | Ajuste a la baja de 5: stock 12 → 7 |
+| 14 | Primer ajuste: stock 0; segundo ajuste rechazado, stock sigue en 0 |
+| 15 | Primera venta rechazada; tras reponer, stock 15; segunda venta OK con total 312800.00 y stock 7 |
+| 19 | 10 ventas; 17 renglones; stock (1,1) = 12, (6,7) = 25 y (4,4) = 5 |
+
+Las pruebas 6 a 11 y 16 a 18 devolvieron los errores 50001 a 50009 previstos, uno por prueba (pestaña **Mensajes**). Como las pruebas de éxito corren dentro de una transacción que se revierte, la base volvió a su estado inicial (prueba 19). Los números de venta que se saltan en las capturas (24, 26, 27, 28) son normales: `IDENTITY` no retrocede al revertir.

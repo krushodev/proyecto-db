@@ -1,4 +1,6 @@
-# Etapa 05: Optimización de Consultas SQL
+# Etapa 05: Optimización de Consultas SQL – Complemento: reescritura de consultas
+
+> Este documento es un **complemento**. El tema técnico de la guía, *Optimización de consultas a través de índices*, con el experimento y las mediciones, está en [`optimizacion_indices/investigacion.md`](optimizacion_indices/investigacion.md).
 
 ## 1. Introducción
 

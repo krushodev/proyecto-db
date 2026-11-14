@@ -155,7 +155,7 @@ ORDER BY a.Id_Auditoria DESC;
 
 ## 6. Integración con seguridad
 
-La tabla `Auditoria` pierde valor si quien audita puede modificarla. Siguiendo la sección 8 de `docs/etapa-05/seguridad.md`:
+La tabla `Auditoria` pierde valor si quien audita puede modificarla. Siguiendo la sección 8 de `docs/etapa-05/seguridad/seguridad.md`:
 
 - `rol_mostrador` **no recibe ningún permiso** sobre `Auditoria`.
 - `rol_administrador` recibe, como máximo, `SELECT`.

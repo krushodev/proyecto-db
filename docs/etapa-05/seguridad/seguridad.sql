@@ -124,6 +124,7 @@ GO
 -- 4.g Usuario real (plantilla, no se ejecuta)
 --     Requiere autenticacion mixta en el servidor. Reemplazar la
 --     contrasena y no guardarla nunca en el repositorio.
+--     La demostracion con logins de la guia esta en seguridad_guia.sql.
 -- ---------------------------------------------------------------------
 -- USE master;
 -- CREATE LOGIN login_mostrador WITH PASSWORD = '<contrasena>', CHECK_POLICY = ON;

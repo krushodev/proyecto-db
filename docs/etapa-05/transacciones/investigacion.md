@@ -52,7 +52,7 @@ Las transacciones están disponibles en todas las ediciones, incluida Express.
 
 - **Estructura única para todas las pruebas:** `BEGIN TRAN` → pasos 1, 2 y 3 → control de stock → `COMMIT`, todo dentro de `TRY`, y el `ROLLBACK` en el `CATCH`.
 - **Descuento de stock atómico:** `UPDATE ... SET stock = stock - cantidad WHERE stock >= cantidad`, y se compara `@@ROWCOUNT` con la cantidad de renglones. Es una sola sentencia, por lo que no hay un intervalo entre "leer el stock" y "descontarlo" en el que otra venta pueda colarse. La alternativa de la guía (leer `@stock_actual`, comparar y después descontar) sí tiene ese intervalo.
-- **Total y descuento calculados antes de insertar la venta**, porque `rol_mostrador` tiene `DENY UPDATE` sobre `Venta` (ver [`seguridad.md`](../seguridad.md)) y no podría corregir el total después.
+- **Total y descuento calculados antes de insertar la venta**, porque `rol_mostrador` tiene `DENY UPDATE` sobre `Venta` (ver [`seguridad.md`](../seguridad/seguridad.md)) y no podría corregir el total después.
 - **Precio histórico:** el precio unitario del detalle es el de lista con la liquidación aplicada (RN.06 y RN.08), y el descuento (RN.07 por método de pago más RN.10 por cliente frecuente) se calcula sobre el subtotal. Con los datos de prueba ningún cliente supera los \$200.000 acumulados, por lo que el descuento por cliente frecuente es 0 % y los resultados no cambian.
 - **Varios renglones por venta:** los renglones se cargan en una variable tipo tabla, de modo que la misma lógica sirve para una venta de 1 o de N productos.
 - **Sin procedimientos almacenados:** ese tema le corresponde a otro integrante. Los bloques se pueden envolver en un procedimiento sin cambiar la lógica (ver sección 6).
@@ -118,7 +118,7 @@ El stock nunca llegó a ser negativo y la unidad no se vendió dos veces. Salida
 ## 6. Integración con los demás temas
 
 - **Procedimientos:** estos bloques son la base de un procedimiento de venta, por ejemplo `sp_RegistrarVentaCompleta`. Alcanza con convertir las variables `@id_cliente`, `@id_metodo`, `@canal` e `@items` en parámetros. Ese procedimiento debería incluir la transacción tal como está acá.
-- **Seguridad:** [`seguridad.md`](../seguridad.md) prevé quitar al mostrador los permisos directos de `INSERT` sobre `Venta` y `Detalle_Venta` y de `UPDATE (stock)`, y darle `EXECUTE` sobre el procedimiento. Funciona por encadenamiento de propiedad, y la transacción no cambia.
+- **Seguridad:** [`seguridad.md`](../seguridad/seguridad.md) prevé quitar al mostrador los permisos directos de `INSERT` sobre `Venta` y `Detalle_Venta` y de `UPDATE (stock)`, y darle `EXECUTE` sobre el procedimiento. Funciona por encadenamiento de propiedad, y la transacción no cambia.
 - **Triggers de auditoría:** `trg_Producto_Talle_Auditoria` se dispara dentro de la transacción de la venta. Si la venta se revierte, la auditoría también.
 
 ## 7. Limitaciones

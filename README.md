@@ -102,7 +102,11 @@ docs/
     ├── seguridad.sql              # Roles, permisos y enmascaramiento
     ├── seguridad_pruebas.sql      # Pruebas de permisos
     ├── seguridad.md
-    ├── optimizacion_consultas.sql # Optimización de consultas
+    ├── optimizacion_indices/      # Optimización de consultas a través de índices
+    │   ├── investigacion.md
+    │   ├── scripts.sql
+    │   └── evidencias/
+    ├── optimizacion_consultas.sql # Complemento: reescritura de consultas
     └── optimizacion_consultas.md
 ```
 
@@ -117,6 +121,7 @@ docs/
 3. Opcional: correr las consultas de [`pruebas-validacion.md`](docs/etapa-03/pruebas-validacion.md) para verificar la carga, la integridad y las restricciones.
 4. Ejecutar las consultas de la Etapa IV (ver [Consultas](#consultas-etapa-iv)). Cada una se corre por separado, después de cargar los datos de prueba.
 5. Ejecutar [`docs/etapa-05/seguridad.sql`](docs/etapa-05/seguridad.sql) y después [`docs/etapa-05/seguridad_pruebas.sql`](docs/etapa-05/seguridad_pruebas.sql). Crean los roles y permisos, y verifican que funcionen.
+6. Ejecutar [`docs/etapa-05/optimizacion_indices/scripts.sql`](docs/etapa-05/optimizacion_indices/scripts.sql) en SSMS con el plan de ejecución real activado (Ctrl+M). Crea la tabla de pruebas `VentaHistorica` (1.200.000 filas) y mide la consulta sin índice, con índice agrupado y con índice no agrupado de cobertura. Resultados en [`investigacion.md`](docs/etapa-05/optimizacion_indices/investigacion.md).
 
 > Los scripts de la Etapa III no son re-ejecutables sobre una base ya creada o poblada. Para volver a correrlos, eliminar antes las tablas o la base `tienda_ropa`. `seguridad.sql` sí se puede volver a ejecutar.
 
@@ -168,7 +173,7 @@ Aplica el principio de mínimo privilegio con roles basados en los actores de lo
 | **II** | DER, modelo relacional y normalización hasta 3FN | ✅ |
 | **III** | Scripts DDL y DML, restricciones de integridad y pruebas de validación | ✅ |
 | **IV** | Casos de uso, comprobante de venta, reporte agregado por categoría y consulta de negocio avanzada | ✅ |
-| **V** | Procedimientos y funciones, transacciones, triggers de auditoría, seguridad y optimización de consultas | ✅ |
+| **V** | Procedimientos y funciones, transacciones, triggers de auditoría, seguridad y optimización de consultas a través de índices | ✅ |
 
 ---
 

@@ -1,0 +1,81 @@
+﻿Salida de scripts.sql ejecutado con sqlcmd -W sobre SQL Server 2025 Express (17.0.1000.7)
+Equipo: Intel Core i3-1125G4, 7,7 GB RAM, SSD. Fecha: 2026-11-14.
+Las 14880 filas de cada consulta se omiten; se deja solo la primera.
+Changed database context to 'tienda_ropa'.
+
+(1200000 rows affected)
+filas desde hasta
+----- ----- -----
+1200000 2020-01-01 00:03:00 2026-11-05 00:00:00
+
+(1 rows affected)
+index_id name type_desc
+-------- ---- ---------
+0 NULL HEAP
+
+(1 rows affected)
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Id_VentaHistorica fecha_hora Id_Cliente total
+----------------- ---------- ---------- -----
+876960 2025-01-01 00:00:00 1 116916.00
+... (filas omitidas en esta evidencia) ...
+
+(14880 rows affected)
+Table 'VentaHistorica'. Scan count 1, logical reads 6780, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 110 ms,  elapsed time = 155 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Id_VentaHistorica fecha_hora Id_Cliente total
+----------------- ---------- ---------- -----
+876960 2025-01-01 00:00:00 1 116916.00
+... (filas omitidas en esta evidencia) ...
+
+(14880 rows affected)
+Table 'VentaHistorica'. Scan count 1, logical reads 92, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 65 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Id_VentaHistorica fecha_hora Id_Cliente total
+----------------- ---------- ---------- -----
+876960 2025-01-01 00:00:00 1 116916.00
+... (filas omitidas en esta evidencia) ...
+
+(14880 rows affected)
+Table 'VentaHistorica'. Scan count 1, logical reads 73, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 59 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Id_VentaHistorica fecha_hora Id_Cliente total
+----------------- ---------- ---------- -----
+876960 2025-01-01 00:00:00 1 116916.00
+... (filas omitidas en esta evidencia) ...
+
+(14880 rows affected)
+Table 'VentaHistorica'. Scan count 1, logical reads 14921, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 15 ms,  elapsed time = 48 ms.
+name type_desc
+---- ---------
+NULL HEAP
+IX_VentaHistorica_fecha_cobertura NONCLUSTERED
+IX_VentaHistorica_fecha_simple NONCLUSTERED
+
+(3 rows affected)

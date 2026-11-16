@@ -2,6 +2,7 @@
 
 **Tema técnico:** 4 – Seguridad
 **Scripts:** [`seguridad.sql`](seguridad.sql), [`seguridad_pruebas.sql`](seguridad_pruebas.sql) y [`seguridad_guia.sql`](seguridad_guia.sql)
+**Evidencias:** [`evidencias/`](evidencias/): salida de [`seguridad_pruebas.sql`](evidencias/resultados_pruebas.txt) y de [`seguridad_guia.sql`](evidencias/resultados_guia.txt)
 **Reglas de negocio:** RN.02, RN.04, RN.08
 
 ---

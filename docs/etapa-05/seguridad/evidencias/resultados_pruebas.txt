@@ -1,0 +1,30 @@
+nro|usuario|operacion|esperado|obtenido|ok|mensaje
+---|-------|---------|--------|--------|--|-------
+1|usr_mostrador_demo|Emitir comprobante (CU-01)|PERMITE|PERMITE|SI|NULL
+2|usr_mostrador_demo|Registrar una venta completa|PERMITE|PERMITE|SI|NULL
+3|usr_mostrador_demo|Registrar un cliente nuevo|PERMITE|PERMITE|SI|NULL
+4|usr_mostrador_demo|Corregir telefono de un cliente|PERMITE|PERMITE|SI|NULL
+5|usr_mostrador_demo|Cambiar un precio|RECHAZA|RECHAZA|SI|The UPDATE permission was denied on the object 'Producto', database 'tienda_ropa', schema 'dbo'.
+6|usr_mostrador_demo|Crear un producto|RECHAZA|RECHAZA|SI|The INSERT permission was denied on the object 'Producto', database 'tienda_ropa', schema 'dbo'.
+7|usr_mostrador_demo|Cambiar el DNI de un cliente|RECHAZA|RECHAZA|SI|The UPDATE permission was denied on the column 'dni' of the object 'Cliente', database 'tienda_ropa', schema 'dbo'.
+8|usr_mostrador_demo|Borrar un cliente|RECHAZA|RECHAZA|SI|The DELETE permission was denied on the object 'Cliente', database 'tienda_ropa', schema 'dbo'.
+9|usr_mostrador_demo|Modificar el total de una venta|RECHAZA|RECHAZA|SI|The UPDATE permission was denied on the object 'Venta', database 'tienda_ropa', schema 'dbo'.
+10|usr_mostrador_demo|Borrar una venta|RECHAZA|RECHAZA|SI|The DELETE permission was denied on the object 'Venta', database 'tienda_ropa', schema 'dbo'.
+11|usr_mostrador_demo|Borrar stock de un talle|RECHAZA|RECHAZA|SI|The DELETE permission was denied on the object 'Producto_Talle', database 'tienda_ropa', schema 'dbo'.
+12|usr_mostrador_demo|Crear una tabla|RECHAZA|RECHAZA|SI|CREATE TABLE permission denied in database 'tienda_ropa'.
+13|usr_mostrador_demo|Eliminar una tabla|RECHAZA|RECHAZA|SI|Cannot drop the table 'Detalle_Venta', because it does not exist or you do not have permission.
+14|usr_admin_demo|Emitir comprobante (heredado)|PERMITE|PERMITE|SI|NULL
+15|usr_admin_demo|Registrar una venta (heredado)|PERMITE|PERMITE|SI|NULL
+16|usr_admin_demo|Cambiar un precio|PERMITE|PERMITE|SI|NULL
+17|usr_admin_demo|Poner un producto en liquidacion|PERMITE|PERMITE|SI|NULL
+18|usr_admin_demo|Crear un producto|PERMITE|PERMITE|SI|NULL
+19|usr_admin_demo|Crear y borrar una categoria|PERMITE|PERMITE|SI|NULL
+20|usr_admin_demo|Modificar el total de una venta|RECHAZA|RECHAZA|SI|The UPDATE permission was denied on the object 'Venta', database 'tienda_ropa', schema 'dbo'.
+21|usr_admin_demo|Borrar una venta|RECHAZA|RECHAZA|SI|The DELETE permission was denied on the object 'Venta', database 'tienda_ropa', schema 'dbo'.
+22|usr_admin_demo|Modificar un detalle de venta|RECHAZA|RECHAZA|SI|The UPDATE permission was denied on the object 'Detalle_Venta', database 'tienda_ropa', schema 'dbo'.
+23|usr_admin_demo|Borrar un cliente|RECHAZA|RECHAZA|SI|The DELETE permission was denied on the object 'Cliente', database 'tienda_ropa', schema 'dbo'.
+24|usr_admin_demo|Eliminar una tabla|RECHAZA|RECHAZA|SI|Cannot drop the table 'Detalle_Venta', because it does not exist or you do not have permission.
+usuario|dni|email|telefono|direccion
+-------|---|-----|--------|---------
+usr_mostrador_demo|38456123|lXXX@XXXX.com|XXXX-1234|xxxx
+usr_admin_demo|38456123|lucia.fernandez@mail.com|3794-551234|Junín 1250, Corrientes
